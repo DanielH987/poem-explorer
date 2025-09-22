@@ -24,3 +24,13 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+.token {
+  cursor: pointer;
+  text-underline-offset: 4px;
+  text-decoration: underline dotted;
+}
+.token:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px black;
+}

@@ -1,0 +1,112 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Poem {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  title     String
+  author    String   @default("Anna Livebardon")
+  sourceUrl String?
+  year      Int?
+  category  String?
+  html      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  lines     Line[]
+  tokens    Token[]
+  tags      PoemTag[]
+}
+
+model Line {
+  id     String @id @default(cuid())
+  poemId String
+  index  Int
+  text   String
+  Poem   Poem   @relation(fields: [poemId], references: [id])
+  @@index([poemId, index])
+  Token Token[]
+}
+
+model Token {
+  id       String  @id @default(cuid())
+  poemId   String
+  lineId   String
+  start    Int
+  end      Int
+  surface  String
+  lemma    String
+  pos      String
+  feats    Json
+  lexemeId String?
+  Poem     Poem    @relation(fields: [poemId], references: [id])
+  Line     Line    @relation(fields: [lineId], references: [id])
+  Lexeme   Lexeme? @relation(fields: [lexemeId], references: [id])
+  @@index([poemId, lineId])
+  @@index([lemma, pos])
+}
+
+model Lexeme {
+  id           String   @id @default(cuid())
+  lemma        String
+  pos          String
+  definition   String   @default("")
+  ipa          String?
+  audioUrlUS   String?
+  audioUrlUK   String?
+  cefr         String?
+  frequency    String?
+  forms        Json?
+  collocations Json?
+  etymology    String?
+  notes        String?
+  senses       Sense[]
+  translations Translation[]
+  tokens       Token[]
+  @@unique([lemma, pos])
+}
+
+model Sense {
+  id       String @id @default(cuid())
+  lexemeId String
+  def      String
+  examples Json   // [{text, poemId?, lineIndex?, tokenIds?}]
+  Lexeme   Lexeme @relation(fields: [lexemeId], references: [id])
+}
+
+model Translation {
+  id       String @id @default(cuid())
+  lexemeId String
+  lang     String
+  text     String
+  Lexeme   Lexeme @relation(fields: [lexemeId], references: [id])
+  @@unique([lexemeId, lang])
+}
+
+model PoemTag {
+  id     String @id @default(cuid())
+  poemId String
+  tag    String
+  Poem   Poem   @relation(fields: [poemId], references: [id])
+  @@index([tag])
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  actor     String
+  action    String
+  entity    String
+  meta      Json
+  createdAt DateTime @default(now())
+}
