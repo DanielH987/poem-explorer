@@ -56,7 +56,7 @@ type LexemeCard = {
 };
 
 export default function PoemViewer({
-  poem,
+  // poem,
   lines,
   tokens,
   deepLink,
