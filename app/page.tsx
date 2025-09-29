@@ -26,27 +26,24 @@ export default async function Catalogue({
   searchParams: { q?: string };
 }) {
   const poems = await getPoems(searchParams.q);
+
   return (
     <div className="space-y-6">
-      <form className="flex gap-2">
-        <input
-          name="q"
-          defaultValue={searchParams.q}
-          placeholder="Search poems…"
-          className="border px-3 py-2 rounded w-full"
-        />
-        <button className="border rounded px-3">Search</button>
-      </form>
+      {searchParams.q ? (
+        <p className="text-sm text-zinc-600">
+          Results for <span className="font-medium">“{searchParams.q}”</span>
+        </p>
+      ) : null}
 
-      <ul className="grid md:grid-cols-2 gap-4">
+      <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {poems.map((p) => (
-          <li key={p.slug} className="border rounded p-4">
+          <li key={p.slug} className="rounded border p-4">
             <h3 className="font-semibold">{p.title}</h3>
             <p className="text-sm text-zinc-600">
               {p.category || ""} {p.year ? `• ${p.year}` : ""}
             </p>
             <Link href={`/poem/${p.slug}`} className="mt-2 inline-block underline">
-              Open
+              Read
             </Link>
           </li>
         ))}

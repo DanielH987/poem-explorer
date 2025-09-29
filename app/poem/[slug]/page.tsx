@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
 import PoemViewer from "@/components/poem-viewer";
+import Breadcrumbs from "@/components/breadcrumbs";
 
 export default async function PoemPage({
   params,
@@ -35,6 +36,7 @@ export default async function PoemPage({
 
   return (
     <div className="space-y-4">
+      <Breadcrumbs poemTitle={poem.title} />
       <h1 className="text-2xl font-bold">{poem.title}</h1>
       <PoemViewer
         poem={{ id: poem.id, slug: poem.slug, title: poem.title }}
