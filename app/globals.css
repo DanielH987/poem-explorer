@@ -130,3 +130,7 @@
     @apply bg-background text-foreground;
   }
 }
+
+header.sticky {
+  box-shadow: 0 0 0 1px rgb(0 0 0 / 0.04);
+}
