@@ -1,53 +1,141 @@
 import Link from "next/link";
 import { prisma } from "@/lib/db";
+import Pagination from "@/components/pagination";
+import AzFilter from "@/components/az-filter";
+import CategoryFilter from "@/components/category-filter";
 
-async function getPoems(q?: string) {
-  if (!q) {
-    return prisma.poem.findMany({
-      select: { slug: true, title: true, year: true, category: true },
-      orderBy: { title: "asc" },
-    });
-  }
-  return prisma.poem.findMany({
-    where: {
+const PAGE_SIZE = 24;
+
+type Search = {
+  q?: string;
+  page?: string;
+  category?: string;
+  letter?: string;
+};
+
+function buildWhere({ q, category, letter }: Search) {
+  const where: any = {};
+  const AND: any[] = [];
+
+  if (q && q.trim()) {
+    AND.push({
       OR: [
         { title: { contains: q, mode: "insensitive" } },
         { category: { contains: q, mode: "insensitive" } },
       ],
-    },
-    select: { slug: true, title: true, year: true, category: true },
-    orderBy: { title: "asc" },
+    });
+  }
+  if (category && category.trim()) {
+    AND.push({ category: { equals: category } });
+  }
+  if (letter && /^[A-Za-z]$/.test(letter)) {
+    AND.push({ title: { startsWith: letter, mode: "insensitive" } });
+  }
+
+  if (AND.length) where.AND = AND;
+  return where;
+}
+
+async function getCategories(): Promise<string[]> {
+  // Distinct categories from DB (ignores nulls)
+  const rows = await prisma.poem.findMany({
+    where: { category: { not: null } },
+    distinct: ["category"],
+    select: { category: true },
   });
+  return rows
+    .map((r) => r.category!)
+    .filter(Boolean)
+    .sort((a, b) => a.localeCompare(b));
 }
 
 export default async function Catalogue({
   searchParams,
 }: {
-  searchParams: { q?: string };
+  searchParams: Search;
 }) {
-  const poems = await getPoems(searchParams.q);
+  const page = Math.max(1, parseInt(searchParams.page || "1", 10));
+  const where = buildWhere(searchParams);
+
+  const [total, poems, categories] = await Promise.all([
+    prisma.poem.count({ where }),
+    prisma.poem.findMany({
+      where,
+      orderBy: [{ title: "asc" }],
+      take: PAGE_SIZE,
+      skip: (page - 1) * PAGE_SIZE,
+      select: { slug: true, title: true, year: true, category: true },
+    }),
+    getCategories(),
+  ]);
+
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   return (
     <div className="space-y-6">
-      {searchParams.q ? (
-        <p className="text-sm text-zinc-600">
-          Results for <span className="font-medium">“{searchParams.q}”</span>
-        </p>
-      ) : null}
+      {/* Filters row */}
+      <section className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="text-sm text-zinc-600">
+          {searchParams.q ? (
+            <>
+              Results for <span className="font-medium">“{searchParams.q}”</span>
+            </>
+          ) : (
+            <>All poems</>
+          )}
+          {total > 0 && (
+            <>
+              {" "}
+              · <span className="font-medium">{total}</span>{" "}
+              {total === 1 ? "result" : "results"}
+            </>
+          )}
+        </div>
 
-      <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="flex flex-wrap items-center gap-3">
+          <CategoryFilter categories={categories} />
+        </div>
+      </section>
+
+      {/* A–Z bar */}
+      <section className="rounded border p-2">
+        <AzFilter />
+      </section>
+
+      {/* Cards grid */}
+      <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {poems.map((p) => (
-          <li key={p.slug} className="rounded border p-4">
-            <h3 className="font-semibold">{p.title}</h3>
-            <p className="text-sm text-zinc-600">
-              {p.category || ""} {p.year ? `• ${p.year}` : ""}
-            </p>
-            <Link href={`/poem/${p.slug}`} className="mt-2 inline-block underline">
+          <li
+            key={p.slug}
+            className="group rounded border bg-white p-4 shadow-sm transition hover:shadow-md"
+          >
+            <h3 className="line-clamp-2 min-h-[3rem] text-base font-semibold group-hover:underline">
+              {p.title}
+            </h3>
+            <div className="mt-1 flex items-center gap-2 text-sm text-zinc-600">
+              {p.category && (
+                <span className="rounded bg-zinc-100 px-2 py-0.5">{p.category}</span>
+              )}
+              {p.year ? <span>• {p.year}</span> : null}
+            </div>
+            <Link
+              href={`/poem/${p.slug}`}
+              className="mt-3 inline-block text-sm underline underline-offset-4"
+            >
               Read
             </Link>
           </li>
         ))}
+        {/* Empty state */}
+        {poems.length === 0 && (
+          <li className="col-span-full rounded border p-6 text-center text-zinc-600">
+            No poems match the current filters.
+          </li>
+        )}
       </ul>
+
+      {/* Pagination */}
+      <Pagination totalPages={totalPages} />
     </div>
   );
 }
