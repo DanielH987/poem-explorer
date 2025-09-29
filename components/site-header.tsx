@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -85,7 +85,9 @@ export default function SiteHeader() {
 
         {/* Center: Global Search (hidden on xs) */}
         <div className="hidden flex-1 px-4 md:block">
-          <GlobalSearch />
+          <Suspense fallback={null}>
+            <GlobalSearch />
+          </Suspense>
         </div>
 
         {/* Right: Nav + Mobile menu button */}
@@ -110,7 +112,9 @@ export default function SiteHeader() {
                 <DialogTitle>Menu</DialogTitle>
               </DialogHeader>
               <div className="space-y-4">
-                <GlobalSearch />
+                <Suspense fallback={null}>
+                  <GlobalSearch />
+                </Suspense>
                 <div className="flex flex-col gap-2">
                   <NavLink href="/" onClick={() => setMenuOpen(false)}>
                     Catalogue
