@@ -1,12 +1,13 @@
 /**
- * Bulk-import Anna Livebardon poems from a local folder into your Next app.
+ * Bulk-import poems from local TXT files into your Next app.
  * Usage:
  *   npm run import:poems -- "C:\\Users\\hootinid\\Desktop\\poesie\\annalivebardon\\en\\poesie"
+ * Optional:
+ *   npm run import:poems -- "C:\\path\\to\\poesie" --dry
  */
 
 import fs from "node:fs";
 import path from "node:path";
-import { JSDOM } from "jsdom";
 
 const APP_BASE = process.env.APP_BASE || "http://localhost:3000";
 const BASIC_USER = process.env.BASIC_AUTH_USER || "admin";
@@ -22,11 +23,6 @@ type ImportBody = {
   category?: string;
 };
 
-const KNOWN_NAV_STRINGS = [
-  "Précédent", "Suivant", "Previous", "Next",
-  "Anna Livebardon", "Poésie", "The Anna Livebardon Homepage is maintained",
-];
-
 function kebab(s: string) {
   return s
     .normalize("NFKD")
@@ -36,86 +32,47 @@ function kebab(s: string) {
     .replace(/^-+|-+$/g, "");
 }
 
-function trimLines(lines: string[]) {
-  // Remove leading/trailing empties & nav-only lines
-  const cleaned = lines
-    .map(l => l.replace(/\s+/g, " ").trim())
-    .filter(l => l.length > 0 && !KNOWN_NAV_STRINGS.some(k => l.includes(k)));
-  // Collapse duplicate consecutive empties (already trimmed)
-  return cleaned;
+function escapeHtml(s: string) {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
-/** Extract poem from a site HTML file (your sample structure) */
-function extractPoemFromHTML(html: string) {
-  const dom = new JSDOM(html);
-  const d = dom.window.document;
-
-  // Title: prefer <h1>, fallback to <title>, fallback to first <b> inside a poem <p>
-  let title =
-    d.querySelector("h1")?.textContent?.trim() ||
-    d.querySelector("title")?.textContent?.trim() ||
-    d.querySelector("p > b")?.textContent?.trim() ||
-    "Untitled";
-
-  // Heuristic: find the poem <p> that contains many <br> (the lines)
-  const candidates = Array.from(d.querySelectorAll("p")).filter(p =>
-    p.innerHTML.toLowerCase().includes("<br")
+/** Convert a .txt poem: first non-empty line = title; rest = poem; preserve stanza breaks. */
+function convertTxtToHTML(txt: string) {
+  const rawLines = txt.split(/\r?\n/).map((l) =>
+    // normalize spacing: tabs -> space, collapse runs, trim right
+    l.replace(/\t+/g, " ").replace(/ {2,}/g, " ").replace(/[ \u00A0]+$/g, "")
   );
 
-  let lines: string[] = [];
-  if (candidates.length) {
-    // Use the longest <p> by innerHTML length (usually the poem block)
-    const poemP = candidates.sort((a, b) => b.innerHTML.length - a.innerHTML.length)[0];
-    // Split on <br> and clean
-    lines = poemP.innerHTML
-      .replace(/<br\s*\/?>/gi, "\n")
-      .replace(/<[^>]+>/g, "") // strip any residual tags
-      .split("\n");
-  } else {
-    // Fallback: use textContent of body, but this includes nav/footer. We'll trim with rules.
-    const bodyText = d.body?.textContent || "";
-    lines = bodyText.split(/\r?\n/);
+  // find title: first non-empty line
+  let titleIdx = rawLines.findIndex((l) => l.trim().length > 0);
+  if (titleIdx === -1) {
+    return { title: "Untitled", html: "" };
   }
 
-  // Remove title echoes and nav lines, trim spacing
-  const titlePlain = title.replace(/\s+/g, " ").trim();
-  let cleaned = lines.filter(l => l.replace(/\s+/g, " ").trim() !== titlePlain);
-  cleaned = trimLines(cleaned);
+  // Title as-is, but normalized single spaces
+  const title = rawLines[titleIdx].replace(/\s+/g, " ").trim();
 
-  // Build minimal clean HTML: each line as <p> (keep stanza breaks by observing empty lines if any)
-  const paragraphs = cleaned.map(l => `<p>${escapeHtml(l)}</p>`).join("");
+  // Content starts after the title line
+  const bodyLines = rawLines.slice(titleIdx + 1);
 
-  return { title, html: paragraphs };
-}
-
-/** Convert a .txt poem into simple <p>…</p> lines (collapse tabs/spaces) */
-function convertTxtToHTML(txt: string) {
-  const lines = txt
-    .split(/\r?\n/)
-  // Keep blank lines (stanza breaks) as empty paragraph markers
-    .map(l => l.replace(/\t+/g, " ").replace(/ {2,}/g, " ").trimEnd());
-
-  // Trim leading/trailing empties but preserve internal blanks
+  // Trim leading/trailing empty lines in body
   let start = 0;
-  while (start < lines.length && lines[start].trim().length === 0) start++;
-  let end = lines.length - 1;
-  while (end >= 0 && lines[end].trim().length === 0) end--;
-  const core = lines.slice(start, end + 1);
+  while (start < bodyLines.length && bodyLines[start].trim().length === 0) start++;
+  let end = bodyLines.length - 1;
+  while (end >= 0 && bodyLines[end].trim().length === 0) end--;
+  const core = start <= end ? bodyLines.slice(start, end + 1) : [];
 
+  // Build paragraphs:
+  // - non-empty -> <p>line</p>
+  // - empty -> <p></p> (keeps stanza breaks)
   const paragraphs = core
-    .map(l => (l.trim().length ? `<p>${escapeHtml(l.trim())}</p>` : "<p></p>"))
+    .map((l) => {
+      const line = l.replace(/\s+/g, " ").trim(); // collapse internal runs
+      return line.length ? `<p>${escapeHtml(line)}</p>` : "<p></p>";
+    })
     .join("");
-  // Title: first non-empty line (uppercase often used in source)
-  const title =
-    core.find(l => l.trim().length > 0)?.replace(/\s+/g, " ").trim() || "Untitled";
-  return { title, html: paragraphs };
-}
 
-function escapeHtml(s: string) {
-  return s
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
+  return { title, html: paragraphs };
 }
 
 function deriveCategory(absPath: string, root: string) {
@@ -141,12 +98,12 @@ async function importOne(body: ImportBody, dryRun = false) {
   console.log(`Imported: ${body.slug} — ${body.title}`);
 }
 
-function listFilesRecursive(dir: string, exts = [".html", ".txt"]) {
+function listTxtFilesRecursive(dir: string) {
   const out: string[] = [];
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
     const p = path.join(dir, entry.name);
-    if (entry.isDirectory()) out.push(...listFilesRecursive(p, exts));
-    else if (exts.includes(path.extname(entry.name).toLowerCase())) out.push(p);
+    if (entry.isDirectory()) out.push(...listTxtFilesRecursive(p));
+    else if (path.extname(entry.name).toLowerCase() === ".txt") out.push(p);
   }
   return out;
 }
@@ -158,36 +115,26 @@ async function main() {
     console.error('Usage: tsx scripts/import-local-poems.ts "C:\\path\\to\\poesie" [--dry]');
     process.exit(1);
   }
-  const files = listFilesRecursive(root, [".html", ".txt"]);
+
+  const files = listTxtFilesRecursive(root);
   if (!files.length) {
-    console.error("No .html or .txt files found under:", root);
+    console.error("No .txt files found under:", root);
     process.exit(1);
   }
 
+  let imported = 0, failed = 0;
+
   for (const file of files) {
     try {
-      const ext = path.extname(file).toLowerCase();
-      const base = path.basename(file, ext);
+      const base = path.basename(file, ".txt");
+      if (/^index$/i.test(base)) continue; // skip any index.txt if present
+
       const category = deriveCategory(file, root);
-      // skip index.html, images, etc.
-      if (/^index$/i.test(base)) continue;
-
-      let title = "";
-      let html = "";
-
       const raw = fs.readFileSync(file, "utf8");
 
-      if (ext === ".html") {
-        const extracted = extractPoemFromHTML(raw);
-        title = extracted.title;
-        html = extracted.html;
-      } else {
-        const converted = convertTxtToHTML(raw);
-        title = converted.title;
-        html = converted.html;
-      }
+      const { title, html } = convertTxtToHTML(raw);
 
-      // Slug from filename; if base starts with numeric (e.g., 011), keep it
+      // slug from filename (keeps numeric prefixes like "011")
       const slug = kebab(base);
 
       const body: ImportBody = {
@@ -195,16 +142,18 @@ async function main() {
         title,
         html,
         category,
-        // Optionally set a sourceUrl that points back to your source tree or website:
-        // sourceUrl: undefined,
-        // year: undefined,
+        // sourceUrl/year optional
       };
 
       await importOne(body, dry);
+      imported++;
     } catch (e: any) {
+      failed++;
       console.error("Failed:", file, "\n  ", e?.message || e);
     }
   }
+
+  console.log(`Done. Imported: ${imported}, Failed: ${failed}${dry ? " (dry run)" : ""}.`);
 }
 
 main();
