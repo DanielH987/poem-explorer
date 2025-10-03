@@ -105,7 +105,7 @@ function convertTxtToHTML(txt: string) {
   );
 
   // find title: first non-empty line (after decoding)
-  let titleIdx = rawLines.findIndex((l) => l.trim().length > 0);
+  const titleIdx = rawLines.findIndex((l) => l.trim().length > 0);
   if (titleIdx === -1) return { title: "Untitled", html: "" };
 
   // Title with collapsed internal whitespace
