@@ -32,43 +32,109 @@ function kebab(s: string) {
     .replace(/^-+|-+$/g, "");
 }
 
+// Minimal HTML entity decoder (common named + numeric)
+function decodeHtmlEntities(input: string) {
+  if (!input) return input;
+  const named: Record<string, string> = {
+    amp: "&",
+    lt: "<",
+    gt: ">",
+    quot: "\"",
+    apos: "'",
+    nbsp: " ",
+    eacute: "é",
+    Eacute: "É",
+    egrave: "è",
+    Egrave: "È",
+    ecirc: "ê",
+    Ecirc: "Ê",
+    aacute: "á",
+    Aacute: "Á",
+    agrave: "à",
+    Agrave: "À",
+    acirc: "â",
+    Acirc: "Â",
+    ccedil: "ç",
+    Ccedil: "Ç",
+    icirc: "î",
+    Icirc: "Î",
+    ocirc: "ô",
+    Ocirc: "Ô",
+    ucirc: "û",
+    Ucirc: "Û",
+    uuml: "ü",
+    Uuml: "Ü",
+    ouml: "ö",
+    Ouml: "Ö",
+    auml: "ä",
+    Auml: "Ä",
+  };
+  // Named entities
+  let s = input.replace(/&([a-zA-Z]+);/g, (_, name: string) => named[name] ?? _);
+  // Numeric decimal
+  s = s.replace(/&#(\d+);/g, (_, num: string) => {
+    const code = parseInt(num, 10);
+    return Number.isFinite(code) ? String.fromCharCode(code) : _;
+  });
+  // Numeric hex
+  s = s.replace(/&#x([0-9a-fA-F]+);/g, (_, hex: string) => {
+    const code = parseInt(hex, 16);
+    return Number.isFinite(code) ? String.fromCharCode(code) : _;
+  });
+  return s;
+}
+
 function escapeHtml(s: string) {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
-/** Convert a .txt poem: first non-empty line = title; rest = poem; preserve stanza breaks. */
+/**
+ * Convert a .txt poem: first non-empty line = title; rest = poem.
+ * - Decodes HTML entities
+ * - Strips all HTML tags (but remembers if a line had class="byline")
+ * - Preserves stanza breaks (blank lines -> <p></p>)
+ */
 function convertTxtToHTML(txt: string) {
+  // Pre-decode entities first, then normalize whitespace
   const rawLines = txt.split(/\r?\n/).map((l) =>
-    // normalize spacing: tabs -> space, collapse runs, trim right
-    l.replace(/\t+/g, " ").replace(/ {2,}/g, " ").replace(/[ \u00A0]+$/g, "")
+    decodeHtmlEntities(
+      l
+        .replace(/\t+/g, " ")      // tabs -> space
+        .replace(/[ \u00A0]+$/g, "") // trim right (including nbsp)
+    )
   );
 
-  // find title: first non-empty line
+  // find title: first non-empty line (after decoding)
   let titleIdx = rawLines.findIndex((l) => l.trim().length > 0);
-  if (titleIdx === -1) {
-    return { title: "Untitled", html: "" };
-  }
+  if (titleIdx === -1) return { title: "Untitled", html: "" };
 
-  // Title as-is, but normalized single spaces
+  // Title with collapsed internal whitespace
   const title = rawLines[titleIdx].replace(/\s+/g, " ").trim();
 
-  // Content starts after the title line
+  // Body lines start after title
   const bodyLines = rawLines.slice(titleIdx + 1);
 
-  // Trim leading/trailing empty lines in body
+  // Trim leading/trailing empties in body (post-strip check will also handle)
   let start = 0;
   while (start < bodyLines.length && bodyLines[start].trim().length === 0) start++;
   let end = bodyLines.length - 1;
   while (end >= 0 && bodyLines[end].trim().length === 0) end--;
   const core = start <= end ? bodyLines.slice(start, end + 1) : [];
 
-  // Build paragraphs:
-  // - non-empty -> <p>line</p>
-  // - empty -> <p></p> (keeps stanza breaks)
+  // Build paragraphs line-by-line:
+  // - Detect if line included 'class="byline"' BEFORE stripping tags
+  // - Strip tags but keep the inner text
+  // - Collapse internal whitespace
   const paragraphs = core
-    .map((l) => {
-      const line = l.replace(/\s+/g, " ").trim(); // collapse internal runs
-      return line.length ? `<p>${escapeHtml(line)}</p>` : "<p></p>";
+    .map((orig) => {
+      const hadByline = /class\s*=\s*["']?byline["']?/i.test(orig);
+      // Strip tags entirely
+      const noTags = orig.replace(/<[^>]*>/g, "");
+      const line = noTags.replace(/\s+/g, " ").trim();
+
+      if (!line.length) return "<p></p>";
+      const safe = escapeHtml(line);
+      return hadByline ? `<p class="byline">${safe}</p>` : `<p>${safe}</p>`;
     })
     .join("");
 
@@ -134,7 +200,7 @@ async function main() {
 
       const { title, html } = convertTxtToHTML(raw);
 
-      // slug from filename (keeps numeric prefixes like "011")
+      // Slug from filename (keeps numeric prefixes like "011")
       const slug = kebab(base);
 
       const body: ImportBody = {
@@ -142,7 +208,6 @@ async function main() {
         title,
         html,
         category,
-        // sourceUrl/year optional
       };
 
       await importOne(body, dry);
