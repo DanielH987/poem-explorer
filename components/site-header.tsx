@@ -93,7 +93,6 @@ export default function SiteHeader() {
         {/* Right: Nav + Mobile menu button */}
         <nav className="hidden items-center gap-1 md:flex">
           <NavLink href="/">Catalogue</NavLink>
-          <NavLink href="/poem/rain-song">Sample</NavLink>
           <NavLink href="/api/poems">API</NavLink>
         </nav>
 
