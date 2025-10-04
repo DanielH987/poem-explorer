@@ -72,9 +72,12 @@ export async function POST(req: Request) {
 
   // Replace lines exactly as parsed (including empty ones)
   await prisma.line.deleteMany({ where: { poemId: poem.id } });
+
   const lines = await prisma.$transaction(
     rawLines.map((l, i) =>
-      prisma.line.create({ data: { poemId: poem.id, index: i, text: l } }),
+      prisma.line.create({
+        data: { poemId: poem.id, index: i, text: l },
+      }),
     ),
   );
 
