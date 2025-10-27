@@ -6,7 +6,7 @@
 // - includes digits inside words        via \p{N}
 
 export const WORD_RE =
-  /\p{L}(?:[\p{L}\p{M}\p{N}]|['’](?=\p{L})|[‐--](?=\p{L}))*/gu;
+  /\p{L}(?:[\p{L}\p{M}\p{N}]|['’](?=\p{L})|[\u2010\u2011-](?=\p{L}))*/gu;
 
 export type TokenSpan = { start: number; end: number; surface: string };
 
