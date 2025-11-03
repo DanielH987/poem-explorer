@@ -283,25 +283,6 @@ function WordDialog({
             )}
           </TabsContent>
         </Tabs>
-
-        <footer className="mt-4 flex justify-between text-sm">
-          <a
-            className="underline"
-            href={`?w=${encodeURIComponent(data?.lemma ?? token.lemma)}&pos=${encodeURIComponent(
-              data?.pos ?? token.pos,
-            )}&token=${encodeURIComponent(token.id)}#lTODO`}
-          >
-            Permalink
-          </a>
-          <a
-            className="underline"
-            href={`mailto:editor@example.com?subject=Word%20issue:%20${encodeURIComponent(
-              data?.lemma ?? token.lemma,
-            )}`}
-          >
-            Report an issue
-          </a>
-        </footer>
       </DialogContent>
     </Dialog>
   );

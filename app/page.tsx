@@ -105,24 +105,20 @@ export default async function Catalogue({
       {/* Cards grid */}
       <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {poems.map((p) => (
-          <li
-            key={p.slug}
-            className="group rounded border bg-white p-4 shadow-sm transition hover:shadow-md"
-          >
-            <h3 className="line-clamp-2 min-h-[3rem] text-base font-semibold group-hover:underline">
-              {p.title}
-            </h3>
-            <div className="mt-1 flex items-center gap-2 text-sm text-zinc-600">
-              {p.category && (
-                <span className="rounded bg-zinc-100 px-2 py-0.5">{p.category}</span>
-              )}
-              {p.year ? <span>• {p.year}</span> : null}
-            </div>
-            <Link
-              href={`/poem/${p.slug}`}
-              className="mt-3 inline-block text-sm underline underline-offset-4"
-            >
-              Read
+          <li key={p.slug} className="group rounded border bg-white p-4 shadow-sm transition hover:shadow-md">
+            <Link href={`/poem/${p.slug}`} className="block h-full">
+              <h3 className="line-clamp-2 min-h-[3rem] text-base font-semibold group-hover:underline">
+                {p.title}
+              </h3>
+              <div className="mt-1 flex items-center gap-2 text-sm text-zinc-600">
+                {p.category && (
+                  <span className="rounded bg-zinc-100 px-2 py-0.5">{p.category}</span>
+                )}
+                {p.year ? <span>• {p.year}</span> : null}
+              </div>
+              <span className="mt-3 inline-block text-sm underline underline-offset-4">
+                Read
+              </span>
             </Link>
           </li>
         ))}
