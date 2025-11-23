@@ -21,6 +21,7 @@ import {
   HoverCardContent,
 } from "@/components/ui/hover-card";
 import { Button } from "@/components/ui/button";
+import { ChevronUp, ChevronRight, ChevronDown, ChevronLeft } from "lucide-react";
 
 type Line = { id: string; index: number; text: string };
 type Token = {
@@ -213,76 +214,152 @@ function WordDialog({
   token: Token;
   onOpenChange: (open: boolean) => void;
 }) {
+  const word = data?.lemma ?? token.lemma;
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg">
-        <DialogHeader>
-          <DialogTitle className="flex items-baseline gap-2">
-            <span className="text-xl">{data?.lemma ?? token.lemma}</span>
-            <span className="text-sm font-normal text-zinc-600">
-              {(data?.pos ?? token.pos) as string}
-              {data?.cefr ? ` • ${data.cefr}` : ""}
-            </span>
-          </DialogTitle>
-        </DialogHeader>
+      <DialogContent className="max-w-md bg-transparent border-none shadow-none p-0">
+        <div className="relative w-[320px] h-[320px] mx-auto">
 
-        <div className="text-sm text-zinc-700">
-          {data?.ipa && <span className="mr-2">{data.ipa}</span>}
-          <AudioButton src={data?.audio?.us} />
-        </div>
-
-        <Tabs defaultValue="def" className="mt-3">
-          <TabsList>
-            <TabsTrigger value="def">Definition</TabsTrigger>
-            <TabsTrigger value="gram">Grammar</TabsTrigger>
-            <TabsTrigger value="more">More</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="def" className="mt-3 space-y-2">
-            <p>{data?.definition ?? "—"}</p>
-            {data?.example && (
-              <p
-                className="text-zinc-700"
-                dangerouslySetInnerHTML={{ __html: data.example.text }}
+          {/* OUTER RING */}
+          <div
+            className="
+              absolute top-1/2 left-1/2
+              -translate-x-1/2 -translate-y-1/2
+              w-64 h-64
+              rounded-full
+              border border-zinc-200
+              bg-zinc-50
+              shadow-md
+              relative
+            "
+          >
+            {/* CROSSHAIR TO VISIBLY DIVIDE INTO 4 */}
+            <div className="absolute inset-0 pointer-events-none">
+              <div
+                className="
+                  absolute top-1/2 left-1/2
+                  -translate-x-1/2 -translate-y-1/2
+                  w-[100%] h-px
+                  bg-zinc-200
+                  rotate-45
+                "
               />
-            )}
-            <Button variant="outline" className="mt-2">
-              Mark as learned
-            </Button>
-          </TabsContent>
+              <div
+                className="
+                  absolute top-1/2 left-1/2
+                  -translate-x-1/2 -translate-y-1/2
+                  w-[100%] h-px
+                  bg-zinc-200
+                  -rotate-45
+                "
+              />
+            </div>
 
-          <TabsContent value="gram" className="mt-3 space-y-2">
-            <p>
-              <em>{token.surface}</em> →{" "}
-              <strong>{data?.lemma ?? token.lemma}</strong>
-            </p>
-            {data?.morphology && (
-              <pre className="bg-zinc-50 p-2 rounded text-xs overflow-auto">
-                {JSON.stringify(data.morphology.features, null, 2)}
-              </pre>
-            )}
-            {data?.collocations && data.collocations.length > 0 && (
-              <ul className="list-disc pl-5">
-                {data.collocations.map((c) => (
-                  <li key={c}>{c}</li>
-                ))}
-              </ul>
-            )}
-          </TabsContent>
+            {/* TOP BUTTON (QUADRANT 1) */}
+            <button
+              type="button"
+              className="
+                absolute
+                top-3 left-1/2
+                -translate-x-1/2
+                flex items-center justify-center
+                w-10 h-10
+                rounded-full
+                bg-white
+                shadow
+                text-zinc-700
+                hover:bg-zinc-100
+                transition-colors
+              "
+              aria-label="Top action"
+            >
+              <ChevronUp className="w-5 h-5" />
+            </button>
 
-          <TabsContent value="more" className="mt-3 space-y-2 text-sm">
-            {data?.etymology && (
-              <p>
-                <b>Etymology:</b> {data.etymology}
-              </p>
-            )}
-            {data?.frequency && (
-              <p>
-                <b>Frequency:</b> {data.frequency}
-              </p>
-            )}
-          </TabsContent>
-        </Tabs>
+            {/* RIGHT BUTTON (QUADRANT 2) */}
+            <button
+              type="button"
+              className="
+                absolute
+                right-3 top-1/2
+                -translate-y-1/2
+                flex items-center justify-center
+                w-10 h-10
+                rounded-full
+                bg-white
+                shadow
+                text-zinc-700
+                hover:bg-zinc-100
+                transition-colors
+              "
+              aria-label="Right action"
+            >
+              <ChevronRight className="w-5 h-5" />
+            </button>
+
+            {/* BOTTOM BUTTON (QUADRANT 3) */}
+            <button
+              type="button"
+              className="
+                absolute
+                bottom-3 left-1/2
+                -translate-x-1/2
+                flex items-center justify-center
+                w-10 h-10
+                rounded-full
+                bg-white
+                shadow
+                text-zinc-700
+                hover:bg-zinc-100
+                transition-colors
+              "
+              aria-label="Bottom action"
+            >
+              <ChevronDown className="w-5 h-5" />
+            </button>
+
+            {/* LEFT BUTTON (QUADRANT 4) */}
+            <button
+              type="button"
+              className="
+                absolute
+                left-3 top-1/2
+                -translate-y-1/2
+                flex items-center justify-center
+                w-10 h-10
+                rounded-full
+                bg-white
+                shadow
+                text-zinc-700
+                hover:bg-zinc-100
+                transition-colors
+              "
+              aria-label="Left action"
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+          </div>
+
+          {/* CENTER WORD CIRCLE */}
+          <div
+            className="
+              absolute top-1/2 left-1/2
+              -translate-x-1/2 -translate-y-1/2
+              w-36 h-36
+              rounded-full
+              bg-white
+              shadow-lg
+              border border-zinc-200
+              flex items-center justify-center
+              text-xl font-semibold
+              text-zinc-900
+              z-10
+            "
+          >
+            <span className="px-4 text-center break-words">{word}</span>
+          </div>
+        </div>
       </DialogContent>
     </Dialog>
   );
