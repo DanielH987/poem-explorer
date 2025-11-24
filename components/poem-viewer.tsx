@@ -232,9 +232,10 @@ function WordDialog({
               bg-zinc-50
               shadow-md
               relative
+              overflow-hidden
             "
           >
-            {/* CROSSHAIR TO VISIBLY DIVIDE INTO 4 */}
+            {/* DIAGONAL DIVIDERS (visual only) */}
             <div className="absolute inset-0 pointer-events-none">
               <div
                 className="
@@ -256,89 +257,86 @@ function WordDialog({
               />
             </div>
 
-            {/* TOP BUTTON (QUADRANT 1) */}
+            {/* TOP QUADRANT BUTTON */}
             <button
               type="button"
               className="
-                absolute
-                top-3 left-1/2
-                -translate-x-1/2
-                flex items-center justify-center
-                w-10 h-10
-                rounded-full
-                bg-white
-                shadow
+                absolute inset-0
                 text-zinc-700
-                hover:bg-zinc-100
+                hover:bg-zinc-100/80
                 transition-colors
+                flex items-center justify-center
               "
+              style={{
+                clipPath: "polygon(50% 50%, 0 0, 100% 0)",
+              }}
               aria-label="Top action"
             >
-              <ChevronUp className="w-5 h-5" />
+              <div className="-translate-y-[350%]">
+                <ChevronUp className="w-7 h-7" />
+              </div>
             </button>
 
-            {/* RIGHT BUTTON (QUADRANT 2) */}
+            {/* RIGHT QUADRANT BUTTON */}
             <button
               type="button"
               className="
-                absolute
-                right-3 top-1/2
-                -translate-y-1/2
-                flex items-center justify-center
-                w-10 h-10
-                rounded-full
-                bg-white
-                shadow
+                absolute inset-0
                 text-zinc-700
-                hover:bg-zinc-100
+                hover:bg-zinc-100/80
                 transition-colors
+                flex items-center justify-center
               "
+              style={{
+                clipPath: "polygon(50% 50%, 100% 0, 100% 100%)",
+              }}
               aria-label="Right action"
             >
-              <ChevronRight className="w-5 h-5" />
+              <div className="translate-x-[350%]">
+                <ChevronRight className="w-7 h-7" />
+              </div>
             </button>
 
-            {/* BOTTOM BUTTON (QUADRANT 3) */}
+            {/* BOTTOM QUADRANT BUTTON */}
             <button
               type="button"
               className="
-                absolute
-                bottom-3 left-1/2
-                -translate-x-1/2
-                flex items-center justify-center
-                w-10 h-10
-                rounded-full
-                bg-white
-                shadow
+                absolute inset-0
                 text-zinc-700
-                hover:bg-zinc-100
+                hover:bg-zinc-100/80
                 transition-colors
+                flex items-center justify-center
               "
+              style={{
+                clipPath: "polygon(50% 50%, 0 100%, 100% 100%)",
+              }}
               aria-label="Bottom action"
             >
-              <ChevronDown className="w-5 h-5" />
+              <div className="translate-y-[350%]">
+                <ChevronDown className="w-7 h-7" />
+              </div>
             </button>
 
-            {/* LEFT BUTTON (QUADRANT 4) */}
+            {/* LEFT QUADRANT BUTTON */}
             <button
               type="button"
               className="
-                absolute
-                left-3 top-1/2
-                -translate-y-1/2
-                flex items-center justify-center
-                w-10 h-10
-                rounded-full
-                bg-white
-                shadow
+                absolute inset-0
                 text-zinc-700
-                hover:bg-zinc-100
+                hover:bg-zinc-100/80
                 transition-colors
+                flex items-center justify-center
               "
+              style={{
+                clipPath: "polygon(50% 50%, 0 0, 0 100%)",
+              }}
               aria-label="Left action"
             >
-              <ChevronLeft className="w-5 h-5" />
+              <div className="-translate-x-[350%]">
+                <ChevronLeft className="w-7 h-7" />
+              </div>
             </button>
+
           </div>
 
           {/* CENTER WORD CIRCLE */}
