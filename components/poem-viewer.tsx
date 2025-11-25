@@ -4,23 +4,11 @@ import { JSX, useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
-  Tabs,
-  TabsList,
-  TabsTrigger,
-  TabsContent,
-} from "@/components/ui/tabs";
-import {
   HoverCard,
   HoverCardTrigger,
   HoverCardContent,
 } from "@/components/ui/hover-card";
-import { Button } from "@/components/ui/button";
+import { WordDialog } from "@/components/word-explorer-dialog";
 
 type Line = { id: string; index: number; text: string };
 type Token = {
@@ -181,7 +169,9 @@ function TokenSpan({
           <div className="text-sm">
             <div className="font-semibold">
               {data?.lemma ?? token.lemma} ·{" "}
-              <span className="uppercase text-zinc-600">{data?.pos ?? token.pos}</span>
+              <span className="uppercase text-zinc-600">
+                {data?.pos ?? token.pos}
+              </span>
             </div>
             <p className="mt-1 text-zinc-700">
               {isFetching && !data ? "Loading…" : data?.definition ?? "—"}
@@ -192,99 +182,12 @@ function TokenSpan({
 
       <WordDialog
         open={active}
-        data={data}
-        token={token}
+        word={data?.lemma ?? token.lemma}
         onOpenChange={(open) => {
           if (!open) onActivate(undefined);
         }}
       />
     </>
-  );
-}
-
-function WordDialog({
-  open,
-  data,
-  token,
-  onOpenChange,
-}: {
-  open: boolean;
-  data?: LexemeCard;
-  token: Token;
-  onOpenChange: (open: boolean) => void;
-}) {
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg">
-        <DialogHeader>
-          <DialogTitle className="flex items-baseline gap-2">
-            <span className="text-xl">{data?.lemma ?? token.lemma}</span>
-            <span className="text-sm font-normal text-zinc-600">
-              {(data?.pos ?? token.pos) as string}
-              {data?.cefr ? ` • ${data.cefr}` : ""}
-            </span>
-          </DialogTitle>
-        </DialogHeader>
-
-        <div className="text-sm text-zinc-700">
-          {data?.ipa && <span className="mr-2">{data.ipa}</span>}
-          <AudioButton src={data?.audio?.us} />
-        </div>
-
-        <Tabs defaultValue="def" className="mt-3">
-          <TabsList>
-            <TabsTrigger value="def">Definition</TabsTrigger>
-            <TabsTrigger value="gram">Grammar</TabsTrigger>
-            <TabsTrigger value="more">More</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="def" className="mt-3 space-y-2">
-            <p>{data?.definition ?? "—"}</p>
-            {data?.example && (
-              <p
-                className="text-zinc-700"
-                dangerouslySetInnerHTML={{ __html: data.example.text }}
-              />
-            )}
-            <Button variant="outline" className="mt-2">
-              Mark as learned
-            </Button>
-          </TabsContent>
-
-          <TabsContent value="gram" className="mt-3 space-y-2">
-            <p>
-              <em>{token.surface}</em> →{" "}
-              <strong>{data?.lemma ?? token.lemma}</strong>
-            </p>
-            {data?.morphology && (
-              <pre className="bg-zinc-50 p-2 rounded text-xs overflow-auto">
-                {JSON.stringify(data.morphology.features, null, 2)}
-              </pre>
-            )}
-            {data?.collocations && data.collocations.length > 0 && (
-              <ul className="list-disc pl-5">
-                {data.collocations.map((c) => (
-                  <li key={c}>{c}</li>
-                ))}
-              </ul>
-            )}
-          </TabsContent>
-
-          <TabsContent value="more" className="mt-3 space-y-2 text-sm">
-            {data?.etymology && (
-              <p>
-                <b>Etymology:</b> {data.etymology}
-              </p>
-            )}
-            {data?.frequency && (
-              <p>
-                <b>Frequency:</b> {data.frequency}
-              </p>
-            )}
-          </TabsContent>
-        </Tabs>
-      </DialogContent>
-    </Dialog>
   );
 }
 

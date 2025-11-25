@@ -52,10 +52,12 @@ async function getCategories(): Promise<string[]> {
 export default async function Catalogue({
   searchParams,
 }: {
-  searchParams: Search;
+  searchParams: Promise<Search>;
 }) {
-  const page = Math.max(1, parseInt(searchParams.page || "1", 10));
-  const where = buildWhere(searchParams);
+  const params = await searchParams;
+
+  const page = Math.max(1, parseInt(params.page ?? "1", 10));
+  const where = buildWhere(params);
 
   const [total, poems, categories] = await Promise.all([
     prisma.poem.count({ where }),
@@ -76,9 +78,9 @@ export default async function Catalogue({
       {/* Filters row */}
       <section className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="text-sm text-zinc-600">
-          {searchParams.q ? (
+          {params.q ? (
             <>
-              Results for <span className="font-medium">“{searchParams.q}”</span>
+              Results for <span className="font-medium">“{params.q}”</span>
             </>
           ) : (
             <>All poems</>
@@ -105,14 +107,19 @@ export default async function Catalogue({
       {/* Cards grid */}
       <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {poems.map((p) => (
-          <li key={p.slug} className="group rounded border bg-white p-4 shadow-sm transition hover:shadow-md">
+          <li
+            key={p.slug}
+            className="group rounded border bg-white p-4 shadow-sm transition hover:shadow-md"
+          >
             <Link href={`/poem/${p.slug}`} className="block h-full">
               <h3 className="line-clamp-2 min-h-[3rem] text-base font-semibold group-hover:underline">
                 {p.title}
               </h3>
               <div className="mt-1 flex items-center gap-2 text-sm text-zinc-600">
                 {p.category && (
-                  <span className="rounded bg-zinc-100 px-2 py-0.5">{p.category}</span>
+                  <span className="rounded bg-zinc-100 px-2 py-0.5">
+                    {p.category}
+                  </span>
                 )}
                 {p.year ? <span>• {p.year}</span> : null}
               </div>
