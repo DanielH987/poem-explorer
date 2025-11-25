@@ -4,24 +4,11 @@ import { JSX, useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
-  Tabs,
-  TabsList,
-  TabsTrigger,
-  TabsContent,
-} from "@/components/ui/tabs";
-import {
   HoverCard,
   HoverCardTrigger,
   HoverCardContent,
 } from "@/components/ui/hover-card";
-import { Button } from "@/components/ui/button";
-import { ChevronUp, ChevronRight, ChevronDown, ChevronLeft } from "lucide-react";
+import { WordDialog } from "@/components/word-explorer-dialog";
 
 type Line = { id: string; index: number; text: string };
 type Token = {
@@ -182,7 +169,9 @@ function TokenSpan({
           <div className="text-sm">
             <div className="font-semibold">
               {data?.lemma ?? token.lemma} ·{" "}
-              <span className="uppercase text-zinc-600">{data?.pos ?? token.pos}</span>
+              <span className="uppercase text-zinc-600">
+                {data?.pos ?? token.pos}
+              </span>
             </div>
             <p className="mt-1 text-zinc-700">
               {isFetching && !data ? "Loading…" : data?.definition ?? "—"}
@@ -193,173 +182,12 @@ function TokenSpan({
 
       <WordDialog
         open={active}
-        data={data}
-        token={token}
+        word={data?.lemma ?? token.lemma}
         onOpenChange={(open) => {
           if (!open) onActivate(undefined);
         }}
       />
     </>
-  );
-}
-
-function WordDialog({
-  open,
-  data,
-  token,
-  onOpenChange,
-}: {
-  open: boolean;
-  data?: LexemeCard;
-  token: Token;
-  onOpenChange: (open: boolean) => void;
-}) {
-  const word = data?.lemma ?? token.lemma;
-
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md bg-transparent border-none shadow-none p-0">
-        <div className="relative w-[320px] h-[320px] mx-auto">
-
-          {/* OUTER RING */}
-          <div
-            className="
-              absolute top-1/2 left-1/2
-              -translate-x-1/2 -translate-y-1/2
-              w-64 h-64
-              rounded-full
-              border border-zinc-200
-              bg-zinc-50
-              shadow-md
-              relative
-              overflow-hidden
-            "
-          >
-            {/* DIAGONAL DIVIDERS (visual only) */}
-            <div className="absolute inset-0 pointer-events-none">
-              <div
-                className="
-                  absolute top-1/2 left-1/2
-                  -translate-x-1/2 -translate-y-1/2
-                  w-[100%] h-px
-                  bg-zinc-200
-                  rotate-45
-                "
-              />
-              <div
-                className="
-                  absolute top-1/2 left-1/2
-                  -translate-x-1/2 -translate-y-1/2
-                  w-[100%] h-px
-                  bg-zinc-200
-                  -rotate-45
-                "
-              />
-            </div>
-
-            {/* TOP QUADRANT BUTTON */}
-            <button
-              type="button"
-              className="
-                absolute inset-0
-                text-zinc-700
-                hover:bg-zinc-100/80
-                transition-colors
-                flex items-center justify-center
-              "
-              style={{
-                clipPath: "polygon(50% 50%, 0 0, 100% 0)",
-              }}
-              aria-label="Top action"
-            >
-              <div className="-translate-y-[350%]">
-                <ChevronUp className="w-7 h-7" />
-              </div>
-            </button>
-
-            {/* RIGHT QUADRANT BUTTON */}
-            <button
-              type="button"
-              className="
-                absolute inset-0
-                text-zinc-700
-                hover:bg-zinc-100/80
-                transition-colors
-                flex items-center justify-center
-              "
-              style={{
-                clipPath: "polygon(50% 50%, 100% 0, 100% 100%)",
-              }}
-              aria-label="Right action"
-            >
-              <div className="translate-x-[350%]">
-                <ChevronRight className="w-7 h-7" />
-              </div>
-            </button>
-
-            {/* BOTTOM QUADRANT BUTTON */}
-            <button
-              type="button"
-              className="
-                absolute inset-0
-                text-zinc-700
-                hover:bg-zinc-100/80
-                transition-colors
-                flex items-center justify-center
-              "
-              style={{
-                clipPath: "polygon(50% 50%, 0 100%, 100% 100%)",
-              }}
-              aria-label="Bottom action"
-            >
-              <div className="translate-y-[350%]">
-                <ChevronDown className="w-7 h-7" />
-              </div>
-            </button>
-
-            {/* LEFT QUADRANT BUTTON */}
-            <button
-              type="button"
-              className="
-                absolute inset-0
-                text-zinc-700
-                hover:bg-zinc-100/80
-                transition-colors
-                flex items-center justify-center
-              "
-              style={{
-                clipPath: "polygon(50% 50%, 0 0, 0 100%)",
-              }}
-              aria-label="Left action"
-            >
-              <div className="-translate-x-[350%]">
-                <ChevronLeft className="w-7 h-7" />
-              </div>
-            </button>
-
-          </div>
-
-          {/* CENTER WORD CIRCLE */}
-          <div
-            className="
-              absolute top-1/2 left-1/2
-              -translate-x-1/2 -translate-y-1/2
-              w-36 h-36
-              rounded-full
-              bg-white
-              shadow-lg
-              border border-zinc-200
-              flex items-center justify-center
-              text-xl font-semibold
-              text-zinc-900
-              z-10
-            "
-          >
-            <span className="px-4 text-center break-words">{word}</span>
-          </div>
-        </div>
-      </DialogContent>
-    </Dialog>
   );
 }
 
