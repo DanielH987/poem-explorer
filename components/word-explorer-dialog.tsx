@@ -100,6 +100,7 @@ export function WordDialog({ open, word, onOpenChange }: WordDialogProps) {
                     max-w-none w-screen h-screen
                     bg-transparent border-none shadow-none p-0
                     flex items-center justify-center
+                    overflow-visible
                 "
                 // prevent outside clicks from closing
                 onInteractOutside={(e) => e.preventDefault()}
@@ -125,7 +126,6 @@ export function WordDialog({ open, word, onOpenChange }: WordDialogProps) {
                 <div
                     className="
                         relative w-full h-full
-                        overflow-hidden
                         cursor-grab active:cursor-grabbing
                         select-none
                     "
