@@ -144,7 +144,6 @@ export function WordDialog({ open, word, audioSrc, onOpenChange }: WordDialogPro
                             bg-zinc-50
                             shadow-md
                             overflow-hidden
-                            relative
                         "
                     >
                         {/* DIAGONAL DIVIDERS */}
@@ -153,7 +152,7 @@ export function WordDialog({ open, word, audioSrc, onOpenChange }: WordDialogPro
                                 className="
                                 absolute top-1/2 left-1/2
                                 -translate-x-1/2 -translate-y-1/2
-                                w-[100%] h-px
+                                w-full h-px
                                 bg-zinc-200
                                 rotate-45
                                 "
@@ -162,7 +161,7 @@ export function WordDialog({ open, word, audioSrc, onOpenChange }: WordDialogPro
                                 className="
                                 absolute top-1/2 left-1/2
                                 -translate-x-1/2 -translate-y-1/2
-                                w-[100%] h-px
+                                w-full h-px
                                 bg-zinc-200
                                 -rotate-45
                                 "
@@ -289,7 +288,7 @@ export function WordDialog({ open, word, audioSrc, onOpenChange }: WordDialogPro
                             z-10
                         "
                     >
-                        <span className="px-4 text-center break-words">{word}</span>
+                        <span className="px-4 text-center wrap-break-words">{word}</span>
 
                         {audioSrc && (
                             <>
