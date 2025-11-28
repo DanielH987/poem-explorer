@@ -8,11 +8,13 @@ import {
     ChevronDown,
     ChevronLeft,
     X,
+    Volume2,
 } from "lucide-react";
 
 type WordDialogProps = {
     open: boolean;
     word: string;
+    audioSrc?: string;
     onOpenChange: (open: boolean) => void;
 };
 
@@ -23,7 +25,7 @@ type PanelState = {
     left: boolean;
 };
 
-export function WordDialog({ open, word, onOpenChange }: WordDialogProps) {
+export function WordDialog({ open, word, audioSrc, onOpenChange }: WordDialogProps) {
     const [panels, setPanels] = useState<PanelState>({
         top: false,
         right: false,
@@ -53,6 +55,7 @@ export function WordDialog({ open, word, onOpenChange }: WordDialogProps) {
 
     const [offset, setOffset] = useState({ x: 0, y: 0 });
     const groupRef = useRef<HTMLDivElement | null>(null);
+    const audioRef = useRef<HTMLAudioElement | null>(null);
     const panelRefs = {
         top: useRef<HTMLDivElement | null>(null),
         right: useRef<HTMLDivElement | null>(null),
@@ -125,7 +128,7 @@ export function WordDialog({ open, word, onOpenChange }: WordDialogProps) {
                 {/* Centered main radial dialog */}
                 <div
                     ref={groupRef}
-                    className="relative w-[320px] h-[320px] transition-transform duration-300"
+                    className="relative w-[400px] h-[400px] transition-transform duration-300"
                     style={{
                         transform: `translate(${offset.x}px, ${offset.y}px)`,
                     }}
@@ -135,7 +138,7 @@ export function WordDialog({ open, word, onOpenChange }: WordDialogProps) {
                         className="
                             absolute top-1/2 left-1/2
                             -translate-x-1/2 -translate-y-1/2
-                            w-64 h-64
+                            w-80 h-80
                             rounded-full
                             border border-zinc-200
                             bg-zinc-50
@@ -148,21 +151,21 @@ export function WordDialog({ open, word, onOpenChange }: WordDialogProps) {
                         <div className="absolute inset-0 pointer-events-none">
                             <div
                                 className="
-                  absolute top-1/2 left-1/2
-                  -translate-x-1/2 -translate-y-1/2
-                  w-[100%] h-px
-                  bg-zinc-200
-                  rotate-45
-                "
+                                absolute top-1/2 left-1/2
+                                -translate-x-1/2 -translate-y-1/2
+                                w-[100%] h-px
+                                bg-zinc-200
+                                rotate-45
+                                "
                             />
                             <div
                                 className="
-                  absolute top-1/2 left-1/2
-                  -translate-x-1/2 -translate-y-1/2
-                  w-[100%] h-px
-                  bg-zinc-200
-                  -rotate-45
-                "
+                                absolute top-1/2 left-1/2
+                                -translate-x-1/2 -translate-y-1/2
+                                w-[100%] h-px
+                                bg-zinc-200
+                                -rotate-45
+                                "
                             />
                         </div>
 
@@ -270,19 +273,40 @@ export function WordDialog({ open, word, onOpenChange }: WordDialogProps) {
                     {/* CENTER WORD CIRCLE */}
                     <div
                         className="
-              absolute top-1/2 left-1/2
-              -translate-x-1/2 -translate-y-1/2
-              w-36 h-36
-              rounded-full
-              bg-white
-              shadow-lg
-              border border-zinc-200
-              flex items-center justify-center
-              text-xl font-semibold text-zinc-900
-              z-10
-            "
+                            absolute top-1/2 left-1/2
+                            -translate-x-1/2 -translate-y-1/2
+                            w-52 h-52
+                            rounded-full
+                            bg-white
+                            shadow-lg
+                            border border-zinc-200
+                            flex items-center justify-center
+                            text-xl font-semibold text-zinc-900
+                            z-10
+                        "
                     >
                         <span className="px-4 text-center break-words">{word}</span>
+
+                        {audioSrc && (
+                            <>
+                            <audio ref={audioRef} src={audioSrc} className="hidden" />
+                            <button
+                                type="button"
+                                onClick={() => audioRef.current?.play()}
+                                className="
+                                inline-flex items-center justify-center
+                                w-8 h-8 rounded-full
+                                border border-zinc-200
+                                bg-zinc-50
+                                hover:bg-zinc-100
+                                transition-colors
+                                "
+                                aria-label="Play pronunciation"
+                            >
+                                <Volume2 className="w-4 h-4" />
+                            </button>
+                            </>
+                        )}
                     </div>
 
                     {/* TOP PANEL */}

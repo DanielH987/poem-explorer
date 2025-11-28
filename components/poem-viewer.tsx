@@ -183,6 +183,7 @@ function TokenSpan({
       <WordDialog
         open={active}
         word={data?.lemma ?? token.lemma}
+        audioSrc={data?.audio?.us ?? data?.audio?.uk}
         onOpenChange={(open) => {
           if (!open) onActivate(undefined);
         }}
