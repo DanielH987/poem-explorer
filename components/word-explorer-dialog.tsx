@@ -170,25 +170,23 @@ export function WordDialog({ open, word, onOpenChange }: WordDialogProps) {
                         <button
                             type="button"
                             className="
-                                absolute inset-0
-                                flex items-center justify-center
-                                text-zinc-700
-                                hover:bg-zinc-100/80
-                                transition-colors
-                            "
-                            style={{
-                                clipPath: "polygon(50% 50%, 0 0, 100% 0)",
-                            }}
+                            absolute inset-0
+                            flex items-center justify-center
+                            text-sky-600
+                            hover:bg-sky-50/80
+                            transition-colors
+                        "
+                            style={{ clipPath: "polygon(50% 50%, 0 0, 100% 0)" }}
                             onClick={() => togglePanel("top")}
                             aria-label="Top panel"
                         >
                             <div className="-translate-y-[350%]">
                                 <ChevronUp
                                     className={`
-                                    w-7 h-7
-                                    transition-transform duration-300
-                                    ${panels.top ? "rotate-180" : ""}
-                                `}
+                                w-7 h-7
+                                transition-transform duration-300
+                                ${panels.top ? "rotate-180" : ""}
+                            `}
                                 />
                             </div>
                         </button>
@@ -197,25 +195,23 @@ export function WordDialog({ open, word, onOpenChange }: WordDialogProps) {
                         <button
                             type="button"
                             className="
-                                absolute inset-0
-                                flex items-center justify-center
-                                text-zinc-700
-                                hover:bg-zinc-100/80
-                                transition-colors
-                            "
-                            style={{
-                                clipPath: "polygon(50% 50%, 100% 0, 100% 100%)",
-                            }}
+                            absolute inset-0
+                            flex items-center justify-center
+                            text-emerald-600
+                            hover:bg-emerald-50/80
+                            transition-colors
+                        "
+                            style={{ clipPath: "polygon(50% 50%, 100% 0, 100% 100%)" }}
                             onClick={() => togglePanel("right")}
                             aria-label="Right panel"
                         >
                             <div className="translate-x-[350%]">
                                 <ChevronRight
                                     className={`
-                                    w-7 h-7
-                                    transition-transform duration-300
-                                    ${panels.right ? "rotate-180" : ""}
-                                `}
+                                w-7 h-7
+                                transition-transform duration-300
+                                ${panels.right ? "rotate-180" : ""}
+                            `}
                                 />
                             </div>
                         </button>
@@ -224,25 +220,23 @@ export function WordDialog({ open, word, onOpenChange }: WordDialogProps) {
                         <button
                             type="button"
                             className="
-                                absolute inset-0
-                                flex items-center justify-center
-                                text-zinc-700
-                                hover:bg-zinc-100/80
-                                transition-colors
-                            "
-                            style={{
-                                clipPath: "polygon(50% 50%, 0 100%, 100% 100%)",
-                            }}
+                            absolute inset-0
+                            flex items-center justify-center
+                            text-amber-600
+                            hover:bg-amber-50/80
+                            transition-colors
+                        "
+                            style={{ clipPath: "polygon(50% 50%, 0 100%, 100% 100%)" }}
                             onClick={() => togglePanel("bottom")}
                             aria-label="Bottom panel"
                         >
                             <div className="translate-y-[350%]">
                                 <ChevronDown
                                     className={`
-                                    w-7 h-7
-                                    transition-transform duration-300
-                                    ${panels.bottom ? "rotate-180" : ""}
-                                `}
+                                w-7 h-7
+                                transition-transform duration-300
+                                ${panels.bottom ? "rotate-180" : ""}
+                            `}
                                 />
                             </div>
                         </button>
@@ -253,13 +247,11 @@ export function WordDialog({ open, word, onOpenChange }: WordDialogProps) {
                             className="
                             absolute inset-0
                             flex items-center justify-center
-                            text-zinc-700
-                            hover:bg-zinc-100/80
+                            text-rose-600
+                            hover:bg-rose-50/80
                             transition-colors
                         "
-                            style={{
-                                clipPath: "polygon(50% 50%, 0 0, 0 100%)",
-                            }}
+                            style={{ clipPath: "polygon(50% 50%, 0 0, 0 100%)" }}
                             onClick={() => togglePanel("left")}
                             aria-label="Left panel"
                         >
@@ -298,23 +290,23 @@ export function WordDialog({ open, word, onOpenChange }: WordDialogProps) {
                         <div
                             ref={panelRefs.top}
                             className="
-                                absolute left-1/2
-                                -translate-x-1/2
-                                -top-3
-                                -translate-y-full
-                                w-64
-                                rounded-2xl
-                                bg-white
-                                shadow-lg
-                                border border-zinc-200
-                                p-3
-                                z-20
-                            "
+                        absolute left-1/2
+                        -translate-x-1/2
+                        -top-3
+                        -translate-y-full
+                        w-64
+                        rounded-2xl
+                        bg-sky-50
+                        shadow-lg
+                        border border-sky-200
+                        p-3
+                        z-20
+                        "
                         >
-                            <div className="text-xs font-semibold uppercase tracking-wide text-zinc-500 mb-1">
+                            <div className="text-xs font-semibold uppercase tracking-wide text-sky-500 mb-1">
                                 Top panel
                             </div>
-                            <div className="text-sm text-zinc-800">
+                            <div className="text-sm text-sky-900">
                                 Content for <strong>{word}</strong> (e.g., definition).
                             </div>
                         </div>
@@ -325,23 +317,23 @@ export function WordDialog({ open, word, onOpenChange }: WordDialogProps) {
                         <div
                             ref={panelRefs.right}
                             className="
-                                absolute top-1/2
-                                -translate-y-1/2
-                                -right-3
-                                translate-x-full
-                                w-64
-                                rounded-2xl
-                                bg-white
-                                shadow-lg
-                                border border-zinc-200
-                                p-3
-                                z-20
-                            "
+                        absolute top-1/2
+                        -translate-y-1/2
+                        -right-3
+                        translate-x-full
+                        w-64
+                        rounded-2xl
+                        bg-emerald-50
+                        shadow-lg
+                        border border-emerald-200
+                        p-3
+                        z-20
+                        "
                         >
-                            <div className="text-xs font-semibold uppercase tracking-wide text-zinc-500 mb-1">
+                            <div className="text-xs font-semibold uppercase tracking-wide text-emerald-500 mb-1">
                                 Right panel
                             </div>
-                            <div className="text-sm text-zinc-800">
+                            <div className="text-sm text-emerald-900">
                                 Content for <strong>{word}</strong> (e.g., grammar).
                             </div>
                         </div>
@@ -352,23 +344,23 @@ export function WordDialog({ open, word, onOpenChange }: WordDialogProps) {
                         <div
                             ref={panelRefs.bottom}
                             className="
-                                absolute left-1/2
-                                -translate-x-1/2
-                                -bottom-3
-                                translate-y-full
-                                w-64
-                                rounded-2xl
-                                bg-white
-                                shadow-lg
-                                border border-zinc-200
-                                p-3
-                                z-20
-                            "
+                        absolute left-1/2
+                        -translate-x-1/2
+                        -bottom-3
+                        translate-y-full
+                        w-64
+                        rounded-2xl
+                        bg-amber-50
+                        shadow-lg
+                        border border-amber-200
+                        p-3
+                        z-20
+                        "
                         >
-                            <div className="text-xs font-semibold uppercase tracking-wide text-zinc-500 mb-1">
+                            <div className="text-xs font-semibold uppercase tracking-wide text-amber-500 mb-1">
                                 Bottom panel
                             </div>
-                            <div className="text-sm text-zinc-800">
+                            <div className="text-sm text-amber-900">
                                 Content for <strong>{word}</strong> (e.g., examples).
                             </div>
                         </div>
@@ -379,23 +371,23 @@ export function WordDialog({ open, word, onOpenChange }: WordDialogProps) {
                         <div
                             ref={panelRefs.left}
                             className="
-                                absolute top-1/2
-                                -translate-y-1/2
-                                -left-3
-                                -translate-x-full
-                                w-64
-                                rounded-2xl
-                                bg-white
-                                shadow-lg
-                                border border-zinc-200
-                                p-3
-                                z-20
-                            "
+                        absolute top-1/2
+                        -translate-y-1/2
+                        -left-3
+                        -translate-x-full
+                        w-64
+                        rounded-2xl
+                        bg-rose-50
+                        shadow-lg
+                        border border-rose-200
+                        p-3
+                        z-20
+                        "
                         >
-                            <div className="text-xs font-semibold uppercase tracking-wide text-zinc-500 mb-1">
+                            <div className="text-xs font-semibold uppercase tracking-wide text-rose-500 mb-1">
                                 Left panel
                             </div>
-                            <div className="text-sm text-zinc-800">
+                            <div className="text-sm text-rose-900">
                                 Content for <strong>{word}</strong> (e.g., translations).
                             </div>
                         </div>
