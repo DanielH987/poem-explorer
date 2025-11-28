@@ -60,6 +60,7 @@ export function WordDialog({ open, lexeme, fallbackWord, onOpenChange }: WordDia
     const [offset, setOffset] = useState({ x: 0, y: 0 });
     const groupRef = useRef<HTMLDivElement | null>(null);
     const audioRef = useRef<HTMLAudioElement | null>(null);
+    const centerRef = useRef<HTMLDivElement | null>(null);
     const panelRefs = {
         top: useRef<HTMLDivElement | null>(null),
         right: useRef<HTMLDivElement | null>(null),
@@ -77,17 +78,26 @@ export function WordDialog({ open, lexeme, fallbackWord, onOpenChange }: WordDia
         }
 
         const panelEl = panelRefs[activeSide].current;
-        if (!panelEl) return;
+        const circleEl = centerRef.current;
+        if (!panelEl || !circleEl) return;
 
         const panelRect = panelEl.getBoundingClientRect();
+        const circleRect = circleEl.getBoundingClientRect();
+
         const viewportCenterX = window.innerWidth / 2;
         const viewportCenterY = window.innerHeight / 2;
 
         const panelCenterX = panelRect.left + panelRect.width / 2;
         const panelCenterY = panelRect.top + panelRect.height / 2;
 
-        const dx = viewportCenterX - panelCenterX;
-        const dy = viewportCenterY - panelCenterY;
+        const circleCenterX = circleRect.left + circleRect.width / 2;
+        const circleCenterY = circleRect.top + circleRect.height / 2;
+
+        const groupCenterX = (panelCenterX + circleCenterX) / 2;
+        const groupCenterY = (panelCenterY + circleCenterY) / 2;
+
+        const dx = viewportCenterX - groupCenterX;
+        const dy = viewportCenterY - groupCenterY;
 
         setOffset((prev) => ({
             x: prev.x + dx,
@@ -279,6 +289,7 @@ export function WordDialog({ open, lexeme, fallbackWord, onOpenChange }: WordDia
 
                     {/* CENTER WORD CIRCLE */}
                     <div
+                        ref={centerRef}
                         className="
                             absolute top-1/2 left-1/2
                             -translate-x-1/2 -translate-y-1/2
