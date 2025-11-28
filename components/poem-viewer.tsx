@@ -191,8 +191,3 @@ function TokenSpan({
     </>
   );
 }
-
-function AudioButton({ src }: { src?: string }) {
-  if (!src) return null;
-  return <audio controls src={src} className="w-full mt-1" />;
-}

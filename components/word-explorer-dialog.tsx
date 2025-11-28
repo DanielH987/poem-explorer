@@ -183,7 +183,7 @@ export function WordDialog({ open, word, audioSrc, onOpenChange }: WordDialogPro
                             onClick={() => togglePanel("top")}
                             aria-label="Top panel"
                         >
-                            <div className="-translate-y-[350%]">
+                            <div className="-translate-y-[460%]">
                                 <ChevronUp
                                     className={`
                                 w-7 h-7
@@ -208,7 +208,7 @@ export function WordDialog({ open, word, audioSrc, onOpenChange }: WordDialogPro
                             onClick={() => togglePanel("right")}
                             aria-label="Right panel"
                         >
-                            <div className="translate-x-[350%]">
+                            <div className="translate-x-[460%]">
                                 <ChevronRight
                                     className={`
                                 w-7 h-7
@@ -233,7 +233,7 @@ export function WordDialog({ open, word, audioSrc, onOpenChange }: WordDialogPro
                             onClick={() => togglePanel("bottom")}
                             aria-label="Bottom panel"
                         >
-                            <div className="translate-y-[350%]">
+                            <div className="translate-y-[460%]">
                                 <ChevronDown
                                     className={`
                                 w-7 h-7
@@ -258,7 +258,7 @@ export function WordDialog({ open, word, audioSrc, onOpenChange }: WordDialogPro
                             onClick={() => togglePanel("left")}
                             aria-label="Left panel"
                         >
-                            <div className="-translate-x-[350%]">
+                            <div className="-translate-x-[460%]">
                                 <ChevronLeft
                                     className={`
                                 w-7 h-7
