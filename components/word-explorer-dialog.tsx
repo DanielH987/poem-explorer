@@ -108,12 +108,12 @@ export function WordDialog({ open, word, onOpenChange }: WordDialogProps) {
                         <button
                             type="button"
                             className="
-                absolute inset-0
-                flex items-center justify-center
-                text-zinc-700
-                hover:bg-zinc-100/80
-                transition-colors
-              "
+                                absolute inset-0
+                                flex items-center justify-center
+                                text-zinc-700
+                                hover:bg-zinc-100/80
+                                transition-colors
+                            "
                             style={{
                                 clipPath: "polygon(50% 50%, 0 0, 100% 0)",
                             }}
@@ -121,7 +121,13 @@ export function WordDialog({ open, word, onOpenChange }: WordDialogProps) {
                             aria-label="Top panel"
                         >
                             <div className="-translate-y-[350%]">
-                                <ChevronUp className="w-7 h-7" />
+                                <ChevronUp
+                                    className={`
+                                    w-7 h-7
+                                    transition-transform duration-300
+                                    ${panels.top ? "rotate-180" : ""}
+                                `}
+                                />
                             </div>
                         </button>
 
@@ -129,12 +135,12 @@ export function WordDialog({ open, word, onOpenChange }: WordDialogProps) {
                         <button
                             type="button"
                             className="
-                absolute inset-0
-                flex items-center justify-center
-                text-zinc-700
-                hover:bg-zinc-100/80
-                transition-colors
-              "
+                                absolute inset-0
+                                flex items-center justify-center
+                                text-zinc-700
+                                hover:bg-zinc-100/80
+                                transition-colors
+                            "
                             style={{
                                 clipPath: "polygon(50% 50%, 100% 0, 100% 100%)",
                             }}
@@ -142,7 +148,13 @@ export function WordDialog({ open, word, onOpenChange }: WordDialogProps) {
                             aria-label="Right panel"
                         >
                             <div className="translate-x-[350%]">
-                                <ChevronRight className="w-7 h-7" />
+                                <ChevronRight
+                                    className={`
+                                    w-7 h-7
+                                    transition-transform duration-300
+                                    ${panels.right ? "rotate-180" : ""}
+                                `}
+                                />
                             </div>
                         </button>
 
@@ -150,12 +162,12 @@ export function WordDialog({ open, word, onOpenChange }: WordDialogProps) {
                         <button
                             type="button"
                             className="
-                absolute inset-0
-                flex items-center justify-center
-                text-zinc-700
-                hover:bg-zinc-100/80
-                transition-colors
-              "
+                                absolute inset-0
+                                flex items-center justify-center
+                                text-zinc-700
+                                hover:bg-zinc-100/80
+                                transition-colors
+                            "
                             style={{
                                 clipPath: "polygon(50% 50%, 0 100%, 100% 100%)",
                             }}
@@ -163,7 +175,13 @@ export function WordDialog({ open, word, onOpenChange }: WordDialogProps) {
                             aria-label="Bottom panel"
                         >
                             <div className="translate-y-[350%]">
-                                <ChevronDown className="w-7 h-7" />
+                                <ChevronDown
+                                    className={`
+                                    w-7 h-7
+                                    transition-transform duration-300
+                                    ${panels.bottom ? "rotate-180" : ""}
+                                `}
+                                />
                             </div>
                         </button>
 
@@ -171,12 +189,12 @@ export function WordDialog({ open, word, onOpenChange }: WordDialogProps) {
                         <button
                             type="button"
                             className="
-                absolute inset-0
-                flex items-center justify-center
-                text-zinc-700
-                hover:bg-zinc-100/80
-                transition-colors
-              "
+                            absolute inset-0
+                            flex items-center justify-center
+                            text-zinc-700
+                            hover:bg-zinc-100/80
+                            transition-colors
+                        "
                             style={{
                                 clipPath: "polygon(50% 50%, 0 0, 0 100%)",
                             }}
@@ -184,7 +202,13 @@ export function WordDialog({ open, word, onOpenChange }: WordDialogProps) {
                             aria-label="Left panel"
                         >
                             <div className="-translate-x-[350%]">
-                                <ChevronLeft className="w-7 h-7" />
+                                <ChevronLeft
+                                    className={`
+                                w-7 h-7
+                                transition-transform duration-300
+                                ${panels.left ? "rotate-180" : ""}
+                            `}
+                                />
                             </div>
                         </button>
                     </div>
