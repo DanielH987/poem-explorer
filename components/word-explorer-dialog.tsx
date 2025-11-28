@@ -10,11 +10,12 @@ import {
     X,
     Volume2,
 } from "lucide-react";
+import type { LexemeCard } from "@/lib/lexeme-card";
 
 type WordDialogProps = {
     open: boolean;
-    word: string;
-    audioSrc?: string;
+    fallbackWord: string;
+    lexeme?: LexemeCard;
     onOpenChange: (open: boolean) => void;
 };
 
@@ -25,13 +26,16 @@ type PanelState = {
     left: boolean;
 };
 
-export function WordDialog({ open, word, audioSrc, onOpenChange }: WordDialogProps) {
+export function WordDialog({ open, lexeme, fallbackWord, onOpenChange }: WordDialogProps) {
     const [panels, setPanels] = useState<PanelState>({
         top: false,
         right: false,
         bottom: false,
         left: false,
     });
+
+    const word = lexeme?.lemma ?? fallbackWord;
+    const audioSrc = lexeme?.audio?.us ?? lexeme?.audio?.uk;
 
     const togglePanel = (side: keyof PanelState) => {
         setPanels((prev) => {
@@ -283,20 +287,22 @@ export function WordDialog({ open, word, audioSrc, onOpenChange }: WordDialogPro
                             bg-white
                             shadow-lg
                             border border-zinc-200
-                            flex items-center justify-center
-                            text-xl font-semibold text-zinc-900
+                            flex flex-col items-center justify-center
+                            gap-2
                             z-10
                         "
                     >
-                        <span className="px-4 text-center wrap-break-words">{word}</span>
+                        <span className="px-4 text-center wrap-break-words text-lg font-semibold">
+                            {word}
+                        </span>
 
                         {audioSrc && (
                             <>
-                            <audio ref={audioRef} src={audioSrc} className="hidden" />
-                            <button
-                                type="button"
-                                onClick={() => audioRef.current?.play()}
-                                className="
+                                <audio ref={audioRef} src={audioSrc} className="hidden" />
+                                <button
+                                    type="button"
+                                    onClick={() => audioRef.current?.play()}
+                                    className="
                                 inline-flex items-center justify-center
                                 w-8 h-8 rounded-full
                                 border border-zinc-200
@@ -304,10 +310,10 @@ export function WordDialog({ open, word, audioSrc, onOpenChange }: WordDialogPro
                                 hover:bg-zinc-100
                                 transition-colors
                                 "
-                                aria-label="Play pronunciation"
-                            >
-                                <Volume2 className="w-4 h-4" />
-                            </button>
+                                    aria-label="Play pronunciation"
+                                >
+                                    <Volume2 className="w-4 h-4" />
+                                </button>
                             </>
                         )}
                     </div>
@@ -317,24 +323,50 @@ export function WordDialog({ open, word, audioSrc, onOpenChange }: WordDialogPro
                         <div
                             ref={panelRefs.top}
                             className="
-                        absolute left-1/2
-                        -translate-x-1/2
-                        -top-3
-                        -translate-y-full
-                        w-64
-                        rounded-2xl
-                        bg-sky-50
-                        shadow-lg
-                        border border-sky-200
-                        p-3
-                        z-20
-                        "
+                            absolute left-1/2
+                            -translate-x-1/2
+                            -top-3
+                            -translate-y-full
+                            w-64
+                            rounded-2xl
+                            bg-sky-50
+                            shadow-lg
+                            border border-sky-200
+                            p-3
+                            z-20
+                            "
                         >
                             <div className="text-xs font-semibold uppercase tracking-wide text-sky-500 mb-1">
-                                Top panel
+                                Definition
                             </div>
+
                             <div className="text-sm text-sky-900">
-                                Content for <strong>{word}</strong> (e.g., definition).
+                                {lexeme?.definition ? (
+                                    <p>{lexeme.definition}</p>
+                                ) : (
+                                    <p className="italic text-sky-700">No definition available.</p>
+                                )}
+
+                                {(lexeme?.ipa || lexeme?.cefr || lexeme?.frequency) && (
+                                    <div className="mt-2 text-xs text-sky-700 space-y-1">
+                                        {lexeme.ipa && (
+                                            <div>
+                                                <span className="font-semibold">IPA:</span> {lexeme.ipa}
+                                            </div>
+                                        )}
+                                        {lexeme.cefr && (
+                                            <div>
+                                                <span className="font-semibold">CEFR:</span> {lexeme.cefr}
+                                            </div>
+                                        )}
+                                        {lexeme.frequency && (
+                                            <div>
+                                                <span className="font-semibold">Frequency:</span>{" "}
+                                                {lexeme.frequency}
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
                             </div>
                         </div>
                     )}
@@ -344,24 +376,68 @@ export function WordDialog({ open, word, audioSrc, onOpenChange }: WordDialogPro
                         <div
                             ref={panelRefs.right}
                             className="
-                        absolute top-1/2
-                        -translate-y-1/2
-                        -right-3
-                        translate-x-full
-                        w-64
-                        rounded-2xl
-                        bg-emerald-50
-                        shadow-lg
-                        border border-emerald-200
-                        p-3
-                        z-20
-                        "
+                            absolute top-1/2
+                            -translate-y-1/2
+                            -right-3
+                            translate-x-full
+                            w-64
+                            rounded-2xl
+                            bg-emerald-50
+                            shadow-lg
+                            border border-emerald-200
+                            p-3
+                            z-20
+                            "
                         >
                             <div className="text-xs font-semibold uppercase tracking-wide text-emerald-500 mb-1">
-                                Right panel
+                                Grammar & Morphology
                             </div>
-                            <div className="text-sm text-emerald-900">
-                                Content for <strong>{word}</strong> (e.g., grammar).
+
+                            <div className="text-sm text-emerald-900 space-y-2">
+                                <div>
+                                    <span className="font-semibold">Part of speech:</span>{" "}
+                                    {lexeme?.pos ?? "—"}
+                                </div>
+
+                                {lexeme?.morphology && (
+                                    <div className="text-xs space-y-1">
+                                        <div>
+                                            <span className="font-semibold">Surface:</span>{" "}
+                                            {lexeme.morphology.surface}
+                                        </div>
+                                        {Object.keys(lexeme.morphology.features).length > 0 && (
+                                            <div>
+                                                <span className="font-semibold">Features:</span>
+                                                <ul className="mt-1 list-disc list-inside space-y-0.5">
+                                                    {Object.entries(lexeme.morphology.features).map(([k, v]) => (
+                                                        <li key={k}>
+                                                            <span className="capitalize">{k}</span>: {v}
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+
+                                {lexeme?.forms && Object.keys(lexeme.forms).length > 0 && (
+                                    <div className="text-xs">
+                                        <span className="font-semibold">Forms:</span>
+                                        <ul className="mt-1 list-disc list-inside space-y-0.5">
+                                            {Object.entries(lexeme.forms).map(([label, form]) => (
+                                                <li key={label}>
+                                                    <span className="capitalize">{label}</span>: {form}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                )}
+
+                                {lexeme?.notes && (
+                                    <div className="text-xs text-emerald-800">
+                                        <span className="font-semibold">Notes:</span> {lexeme.notes}
+                                    </div>
+                                )}
                             </div>
                         </div>
                     )}
@@ -371,24 +447,40 @@ export function WordDialog({ open, word, audioSrc, onOpenChange }: WordDialogPro
                         <div
                             ref={panelRefs.bottom}
                             className="
-                        absolute left-1/2
-                        -translate-x-1/2
-                        -bottom-3
-                        translate-y-full
-                        w-64
-                        rounded-2xl
-                        bg-amber-50
-                        shadow-lg
-                        border border-amber-200
-                        p-3
-                        z-20
-                        "
+                            absolute left-1/2
+                            -translate-x-1/2
+                            -bottom-3
+                            translate-y-full
+                            w-64
+                            rounded-2xl
+                            bg-amber-50
+                            shadow-lg
+                            border border-amber-200
+                            p-3
+                            z-20
+                            "
                         >
                             <div className="text-xs font-semibold uppercase tracking-wide text-amber-500 mb-1">
-                                Bottom panel
+                                Examples & Collocations
                             </div>
-                            <div className="text-sm text-amber-900">
-                                Content for <strong>{word}</strong> (e.g., examples).
+
+                            <div className="text-sm text-amber-900 space-y-2">
+                                {lexeme?.example?.text ? (
+                                    <p>“{lexeme.example.text}”</p>
+                                ) : (
+                                    <p className="italic text-amber-700">No example available.</p>
+                                )}
+
+                                {lexeme?.collocations && lexeme.collocations.length > 0 && (
+                                    <div className="text-xs">
+                                        <span className="font-semibold">Collocations:</span>
+                                        <ul className="mt-1 list-disc list-inside space-y-0.5">
+                                            {lexeme.collocations.map((c) => (
+                                                <li key={c}>{c}</li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     )}
@@ -398,24 +490,36 @@ export function WordDialog({ open, word, audioSrc, onOpenChange }: WordDialogPro
                         <div
                             ref={panelRefs.left}
                             className="
-                        absolute top-1/2
-                        -translate-y-1/2
-                        -left-3
-                        -translate-x-full
-                        w-64
-                        rounded-2xl
-                        bg-rose-50
-                        shadow-lg
-                        border border-rose-200
-                        p-3
-                        z-20
-                        "
+                            absolute top-1/2
+                            -translate-y-1/2
+                            -left-3
+                            -translate-x-full
+                            w-64
+                            rounded-2xl
+                            bg-rose-50
+                            shadow-lg
+                            border border-rose-200
+                            p-3
+                            z-20
+                            "
                         >
                             <div className="text-xs font-semibold uppercase tracking-wide text-rose-500 mb-1">
-                                Left panel
+                                Translations
                             </div>
+
                             <div className="text-sm text-rose-900">
-                                Content for <strong>{word}</strong> (e.g., translations).
+                                {lexeme?.translations && Object.keys(lexeme.translations).length > 0 ? (
+                                    <ul className="text-xs space-y-0.5">
+                                        {Object.entries(lexeme.translations).map(([lang, text]) => (
+                                            <li key={lang}>
+                                                <span className="uppercase font-semibold">{lang}:</span>{" "}
+                                                {text}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                ) : (
+                                    <p className="italic text-rose-700">No translations available.</p>
+                                )}
                             </div>
                         </div>
                     )}
