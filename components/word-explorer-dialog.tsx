@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import {
     ChevronUp,
@@ -32,55 +32,117 @@ export function WordDialog({ open, word, onOpenChange }: WordDialogProps) {
     });
 
     const togglePanel = (side: keyof PanelState) => {
-        setPanels((prev) => ({
-            ...prev,
-            [side]: !prev[side],
-        }));
+        setPanels((prev) => {
+            const isOpen = prev[side];
+
+            // Close all if clicking the open one
+            if (isOpen) {
+                return { top: false, right: false, bottom: false, left: false };
+            }
+
+            // Otherwise open only the clicked one
+            return {
+                top: false,
+                right: false,
+                bottom: false,
+                left: false,
+                [side]: true,
+            };
+        });
     };
+
+    const [offset, setOffset] = useState({ x: 0, y: 0 });
+    const groupRef = useRef<HTMLDivElement | null>(null);
+    const panelRefs = {
+        top: useRef<HTMLDivElement | null>(null),
+        right: useRef<HTMLDivElement | null>(null),
+        bottom: useRef<HTMLDivElement | null>(null),
+        left: useRef<HTMLDivElement | null>(null),
+    };
+
+    useEffect(() => {
+        const activeSide = (Object.keys(panels) as (keyof PanelState)[])
+            .find((side) => panels[side]);
+
+        if (!activeSide) {
+            setOffset({ x: 0, y: 0 });
+            return;
+        }
+
+        const panelEl = panelRefs[activeSide].current;
+        if (!panelEl) return;
+
+        const panelRect = panelEl.getBoundingClientRect();
+        const viewportCenterX = window.innerWidth / 2;
+        const viewportCenterY = window.innerHeight / 2;
+
+        const panelCenterX = panelRect.left + panelRect.width / 2;
+        const panelCenterY = panelRect.top + panelRect.height / 2;
+
+        const dx = viewportCenterX - panelCenterX;
+        const dy = viewportCenterY - panelCenterY;
+
+        setOffset((prev) => ({
+            x: prev.x + dx,
+            y: prev.y + dy,
+        }));
+    }, [panels]);
+
+    useEffect(() => {
+        if (!open) {
+            setPanels({ top: false, right: false, bottom: false, left: false });
+            setOffset({ x: 0, y: 0 });
+        }
+    }, [open]);
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent
                 className="
-          max-w-none w-screen h-screen
-          bg-transparent border-none shadow-none p-0
-          flex items-center justify-center
-          overflow-visible
-        "
-                onInteractOutside={(e) => e.preventDefault()}
+                    max-w-none w-screen h-screen
+                    bg-transparent border-none shadow-none p-0
+                    flex items-center justify-center
+                    overflow-visible
+                    "
             >
                 {/* Close button */}
                 <button
                     type="button"
                     onClick={() => onOpenChange(false)}
                     className="
-            absolute top-4 right-4 z-30
-            inline-flex items-center justify-center
-            w-8 h-8 rounded-full
-            bg-white shadow border border-zinc-200
-            text-zinc-700 hover:bg-zinc-100
-            transition-colors
-          "
+                        absolute top-4 right-4 z-30
+                        inline-flex items-center justify-center
+                        w-8 h-8 rounded-full
+                        bg-white shadow border border-zinc-200
+                        text-zinc-700 hover:bg-zinc-100
+                        transition-colors
+                    "
                     aria-label="Close"
                 >
                     <X className="w-4 h-4" />
                 </button>
 
                 {/* Centered main radial dialog */}
-                <div className="relative w-[320px] h-[320px]">
+                <div
+                    ref={groupRef}
+                    className="relative w-[320px] h-[320px] transition-transform duration-300"
+                    style={{
+                        transform: `translate(${offset.x}px, ${offset.y}px)`,
+                    }}
+                >
                     {/* OUTER RING */}
                     <div
                         className="
-              absolute top-1/2 left-1/2
-              -translate-x-1/2 -translate-y-1/2
-              w-64 h-64
-              rounded-full
-              border border-zinc-200
-              bg-zinc-50
-              shadow-md
-              overflow-hidden
-              relative
-            "
+                            absolute top-1/2 left-1/2
+                            -translate-x-1/2 -translate-y-1/2
+                            w-64 h-64
+                            rounded-full
+                            border border-zinc-200
+                            bg-zinc-50
+                            shadow-md
+                            overflow-hidden
+                            relative
+                        "
                     >
                         {/* DIAGONAL DIVIDERS */}
                         <div className="absolute inset-0 pointer-events-none">
@@ -234,19 +296,20 @@ export function WordDialog({ open, word, onOpenChange }: WordDialogProps) {
                     {/* TOP PANEL */}
                     {panels.top && (
                         <div
+                            ref={panelRefs.top}
                             className="
-                absolute left-1/2
-                -translate-x-1/2
-                -top-3
-                -translate-y-full
-                w-64
-                rounded-2xl
-                bg-white
-                shadow-lg
-                border border-zinc-200
-                p-3
-                z-20
-              "
+                                absolute left-1/2
+                                -translate-x-1/2
+                                -top-3
+                                -translate-y-full
+                                w-64
+                                rounded-2xl
+                                bg-white
+                                shadow-lg
+                                border border-zinc-200
+                                p-3
+                                z-20
+                            "
                         >
                             <div className="text-xs font-semibold uppercase tracking-wide text-zinc-500 mb-1">
                                 Top panel
@@ -260,19 +323,20 @@ export function WordDialog({ open, word, onOpenChange }: WordDialogProps) {
                     {/* RIGHT PANEL */}
                     {panels.right && (
                         <div
+                            ref={panelRefs.right}
                             className="
-                absolute top-1/2
-                -translate-y-1/2
-                -right-3
-                translate-x-full
-                w-64
-                rounded-2xl
-                bg-white
-                shadow-lg
-                border border-zinc-200
-                p-3
-                z-20
-              "
+                                absolute top-1/2
+                                -translate-y-1/2
+                                -right-3
+                                translate-x-full
+                                w-64
+                                rounded-2xl
+                                bg-white
+                                shadow-lg
+                                border border-zinc-200
+                                p-3
+                                z-20
+                            "
                         >
                             <div className="text-xs font-semibold uppercase tracking-wide text-zinc-500 mb-1">
                                 Right panel
@@ -286,19 +350,20 @@ export function WordDialog({ open, word, onOpenChange }: WordDialogProps) {
                     {/* BOTTOM PANEL */}
                     {panels.bottom && (
                         <div
+                            ref={panelRefs.bottom}
                             className="
-                absolute left-1/2
-                -translate-x-1/2
-                -bottom-3
-                translate-y-full
-                w-64
-                rounded-2xl
-                bg-white
-                shadow-lg
-                border border-zinc-200
-                p-3
-                z-20
-              "
+                                absolute left-1/2
+                                -translate-x-1/2
+                                -bottom-3
+                                translate-y-full
+                                w-64
+                                rounded-2xl
+                                bg-white
+                                shadow-lg
+                                border border-zinc-200
+                                p-3
+                                z-20
+                            "
                         >
                             <div className="text-xs font-semibold uppercase tracking-wide text-zinc-500 mb-1">
                                 Bottom panel
@@ -312,19 +377,20 @@ export function WordDialog({ open, word, onOpenChange }: WordDialogProps) {
                     {/* LEFT PANEL */}
                     {panels.left && (
                         <div
+                            ref={panelRefs.left}
                             className="
-                absolute top-1/2
-                -translate-y-1/2
-                -left-3
-                -translate-x-full
-                w-64
-                rounded-2xl
-                bg-white
-                shadow-lg
-                border border-zinc-200
-                p-3
-                z-20
-              "
+                                absolute top-1/2
+                                -translate-y-1/2
+                                -left-3
+                                -translate-x-full
+                                w-64
+                                rounded-2xl
+                                bg-white
+                                shadow-lg
+                                border border-zinc-200
+                                p-3
+                                z-20
+                            "
                         >
                             <div className="text-xs font-semibold uppercase tracking-wide text-zinc-500 mb-1">
                                 Left panel
