@@ -172,13 +172,14 @@ export function WordDialog({ open, word, audioSrc, onOpenChange }: WordDialogPro
                         {/* TOP QUADRANT */}
                         <button
                             type="button"
-                            className="
-                            absolute inset-0
-                            flex items-center justify-center
-                            text-sky-600
-                            hover:bg-sky-50/80
-                            transition-colors
-                        "
+                            className={`
+                                absolute inset-0
+                                flex items-center justify-center
+                                text-sky-600
+                                hover:bg-sky-50/80
+                                ${panels.top ? "bg-sky-50/80" : ""}
+                                transition-colors
+                            `}
                             style={{ clipPath: "polygon(50% 50%, 0 0, 100% 0)" }}
                             onClick={() => togglePanel("top")}
                             aria-label="Top panel"
@@ -197,13 +198,14 @@ export function WordDialog({ open, word, audioSrc, onOpenChange }: WordDialogPro
                         {/* RIGHT QUADRANT */}
                         <button
                             type="button"
-                            className="
-                            absolute inset-0
-                            flex items-center justify-center
-                            text-emerald-600
-                            hover:bg-emerald-50/80
-                            transition-colors
-                        "
+                            className={`
+                                absolute inset-0
+                                flex items-center justify-center
+                                text-emerald-600
+                                hover:bg-emerald-50/80
+                                ${panels.right ? "bg-emerald-50/80" : ""}
+                                transition-colors
+                            `}
                             style={{ clipPath: "polygon(50% 50%, 100% 0, 100% 100%)" }}
                             onClick={() => togglePanel("right")}
                             aria-label="Right panel"
@@ -222,13 +224,14 @@ export function WordDialog({ open, word, audioSrc, onOpenChange }: WordDialogPro
                         {/* BOTTOM QUADRANT */}
                         <button
                             type="button"
-                            className="
-                            absolute inset-0
-                            flex items-center justify-center
-                            text-amber-600
-                            hover:bg-amber-50/80
-                            transition-colors
-                        "
+                            className={`"
+                                absolute inset-0
+                                flex items-center justify-center
+                                text-amber-600
+                                hover:bg-amber-50/80
+                                ${panels.bottom ? "bg-amber-50/80" : ""}
+                                transition-colors
+                            `}
                             style={{ clipPath: "polygon(50% 50%, 0 100%, 100% 100%)" }}
                             onClick={() => togglePanel("bottom")}
                             aria-label="Bottom panel"
@@ -247,13 +250,14 @@ export function WordDialog({ open, word, audioSrc, onOpenChange }: WordDialogPro
                         {/* LEFT QUADRANT */}
                         <button
                             type="button"
-                            className="
-                            absolute inset-0
-                            flex items-center justify-center
-                            text-rose-600
-                            hover:bg-rose-50/80
-                            transition-colors
-                        "
+                            className={`
+                                absolute inset-0
+                                flex items-center justify-center
+                                text-rose-600
+                                hover:bg-rose-50/80
+                                ${panels.left ? "bg-rose-50/80" : ""}
+                                transition-colors
+                            `}
                             style={{ clipPath: "polygon(50% 50%, 0 0, 0 100%)" }}
                             onClick={() => togglePanel("left")}
                             aria-label="Left panel"
