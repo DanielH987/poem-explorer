@@ -141,7 +141,6 @@ function TokenSpan({
   );
 
   const word = data?.lemma ?? token.lemma;
-  const audioSrc = data?.audio?.us ?? data?.audio?.uk;
 
   return (
     <>
