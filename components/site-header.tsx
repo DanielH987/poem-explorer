@@ -118,12 +118,9 @@ export default function SiteHeader() {
                   <NavLink href="/" onClick={() => setMenuOpen(false)}>
                     Catalogue
                   </NavLink>
-                  <NavLink href="/poem/rain-song" onClick={() => setMenuOpen(false)}>
-                    Sample
-                  </NavLink>
-                  <NavLink href="/api/poems" onClick={() => setMenuOpen(false)}>
+                  {/* <NavLink href="/api/poems" onClick={() => setMenuOpen(false)}>
                     API
-                  </NavLink>
+                  </NavLink> */}
                 </div>
               </div>
             </DialogContent>

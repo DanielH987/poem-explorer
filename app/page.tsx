@@ -80,16 +80,17 @@ export default async function Catalogue({
         <div className="text-sm text-zinc-600">
           {params.q ? (
             <>
-              Results for <span className="font-medium">“{params.q}”</span>
+              Résultats pour{" "}
+              <span className="font-medium">“{params.q}”</span>
             </>
           ) : (
-            <>All poems</>
+            <>Tous les poèmes</>
           )}
           {total > 0 && (
             <>
               {" "}
               · <span className="font-medium">{total}</span>{" "}
-              {total === 1 ? "result" : "results"}
+              {total === 1 ? "résultat" : "résultats"}
             </>
           )}
         </div>
@@ -124,7 +125,7 @@ export default async function Catalogue({
                 {p.year ? <span>• {p.year}</span> : null}
               </div>
               <span className="mt-3 inline-block text-sm underline underline-offset-4">
-                Read
+                Lire
               </span>
             </Link>
           </li>
@@ -132,7 +133,7 @@ export default async function Catalogue({
         {/* Empty state */}
         {poems.length === 0 && (
           <li className="col-span-full rounded border p-6 text-center text-zinc-600">
-            No poems match the current filters.
+            Aucun poème ne correspond aux filtres actuels.
           </li>
         )}
       </ul>
