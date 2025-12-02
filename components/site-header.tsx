@@ -52,12 +52,12 @@ function GlobalSearch({ className }: { className?: string }) {
         <Input
           name="q"
           defaultValue={defaultValue}
-          placeholder="Search poems…"
-          aria-label="Search poems"
+          placeholder="Rechercher des poèmes…"
+          aria-label="Rechercher des poèmes"
           className="w-full"
         />
         <Button type="submit" variant="secondary">
-          Search
+          Rechercher
         </Button>
       </div>
     </form>
@@ -77,9 +77,11 @@ export default function SiteHeader() {
               AL
             </span>
             <span className="hidden text-sm font-semibold sm:inline">
-              Anna Livebardon — Poem Explorer
+              Anna Livebardon — Explorateur de poèmes
             </span>
-            <span className="text-sm font-semibold sm:hidden">Poem Explorer</span>
+            <span className="text-sm font-semibold sm:hidden">
+              Explorateur de poèmes
+            </span>
           </Link>
         </div>
 
@@ -100,7 +102,7 @@ export default function SiteHeader() {
           <Button
             variant="outline"
             size="sm"
-            aria-label="Open menu"
+            aria-label="Ouvrir le menu"
             onClick={() => setMenuOpen(true)}
           >
             Menu
