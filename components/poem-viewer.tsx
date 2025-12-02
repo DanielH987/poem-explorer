@@ -9,6 +9,7 @@ import {
   HoverCardContent,
 } from "@/components/ui/hover-card";
 import { WordDialog } from "@/components/word-explorer-dialog";
+import type { LexemeCard } from "@/lib/lexeme-card";
 
 type Line = { id: string; index: number; text: string };
 type Token = {
@@ -19,28 +20,6 @@ type Token = {
   surface: string;
   lemma: string;
   pos: string;
-};
-type LexemeCard = {
-  lemma: string;
-  pos: string;
-  cefr?: string;
-  ipa?: string;
-  audio?: { us?: string; uk?: string };
-  definition: string;
-  example?: { text: string };
-  morphology?: {
-    surface: string;
-    lemma: string;
-    pos: string;
-    features: Record<string, string>;
-  };
-  forms?: Record<string, string>;
-  transitivity?: string;
-  collocations?: string[];
-  frequency?: string;
-  etymology?: string;
-  translations?: Record<string, string>;
-  notes?: string;
 };
 
 export default function PoemViewer({
@@ -140,16 +119,16 @@ function TokenSpan({
       );
       return (await r.json()) as LexemeCard;
     },
-    enabled: isHovering || active, // fetch on hover or when modal opens
+    enabled: isHovering || active,
     staleTime: 60_000,
   });
 
-  // Hover card (desktop) + click to open dialog
   const trigger = (
     <span
       tabIndex={0}
       data-token-id={token.id}
-      className={`token inline-block rounded-sm px-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black ${active ? "bg-yellow-100" : ""}`}
+      className={`token inline-block rounded-sm px-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black ${active ? "bg-yellow-100" : ""
+        }`}
       onClick={() => onActivate(token.id)}
       onKeyDown={(e) => {
         if (e.key === "Enter") onActivate(token.id);
@@ -161,6 +140,8 @@ function TokenSpan({
     </span>
   );
 
+  const word = data?.lemma ?? token.lemma;
+
   return (
     <>
       <HoverCard openDelay={100} closeDelay={80}>
@@ -168,7 +149,7 @@ function TokenSpan({
         <HoverCardContent className="w-64">
           <div className="text-sm">
             <div className="font-semibold">
-              {data?.lemma ?? token.lemma} ·{" "}
+              {word} ·{" "}
               <span className="uppercase text-zinc-600">
                 {data?.pos ?? token.pos}
               </span>
@@ -182,16 +163,12 @@ function TokenSpan({
 
       <WordDialog
         open={active}
-        word={data?.lemma ?? token.lemma}
+        lexeme={data}
+        fallbackWord={token.lemma}
         onOpenChange={(open) => {
           if (!open) onActivate(undefined);
         }}
       />
     </>
   );
-}
-
-function AudioButton({ src }: { src?: string }) {
-  if (!src) return null;
-  return <audio controls src={src} className="w-full mt-1" />;
 }

@@ -22,13 +22,13 @@ export default function CategoryFilter({
 
   return (
     <label className="inline-flex items-center gap-2 text-sm">
-      <span className="text-zinc-600">Category</span>
+      <span className="text-zinc-600">Catégorie</span>
       <select
         className="rounded border bg-white px-2 py-1"
         value={selected}
         onChange={onChange}
       >
-        <option value="">All</option>
+        <option value="">Toutes</option>
         {categories.map((c) => (
           <option key={c} value={c}>
             {c}

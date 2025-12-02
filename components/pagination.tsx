@@ -47,7 +47,7 @@ export default function Pagination({
         href={`${pathname}?${setParam(sp, "page", String(prev)).toString()}`}
         aria-disabled={currentPage === 1}
       >
-        Prev
+        Précédent
       </Link>
 
       {pages.map((p, i) =>
@@ -74,7 +74,7 @@ export default function Pagination({
         href={`${pathname}?${setParam(sp, "page", String(next)).toString()}`}
         aria-disabled={currentPage === totalPages}
       >
-        Next
+        Suivant
       </Link>
     </nav>
   );
