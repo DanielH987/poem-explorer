@@ -57,8 +57,8 @@ export function WordDialog({ open, lexeme, fallbackWord, onOpenChange }: WordDia
         });
     };
 
-    const [offset, setOffset] = useState({ x: 0, y: 0 });
-    const groupRef = useRef<HTMLDivElement | null>(null);
+    // const [offset, setOffset] = useState({ x: 0, y: 0 });
+    // const groupRef = useRef<HTMLDivElement | null>(null);
     const audioRef = useRef<HTMLAudioElement | null>(null);
     const centerRef = useRef<HTMLDivElement | null>(null);
     const panelRefs = {
@@ -68,47 +68,47 @@ export function WordDialog({ open, lexeme, fallbackWord, onOpenChange }: WordDia
         left: useRef<HTMLDivElement | null>(null),
     };
 
-    useEffect(() => {
-        const activeSide = (Object.keys(panels) as (keyof PanelState)[])
-            .find((side) => panels[side]);
+    // useEffect(() => {
+    //     const activeSide = (Object.keys(panels) as (keyof PanelState)[])
+    //         .find((side) => panels[side]);
 
-        if (!activeSide) {
-            setOffset({ x: 0, y: 0 });
-            return;
-        }
+    //     if (!activeSide) {
+    //         setOffset({ x: 0, y: 0 });
+    //         return;
+    //     }
 
-        const panelEl = panelRefs[activeSide].current;
-        const circleEl = centerRef.current;
-        if (!panelEl || !circleEl) return;
+    //     const panelEl = panelRefs[activeSide].current;
+    //     const circleEl = centerRef.current;
+    //     if (!panelEl || !circleEl) return;
 
-        const panelRect = panelEl.getBoundingClientRect();
-        const circleRect = circleEl.getBoundingClientRect();
+    //     const panelRect = panelEl.getBoundingClientRect();
+    //     const circleRect = circleEl.getBoundingClientRect();
 
-        const viewportCenterX = window.innerWidth / 2;
-        const viewportCenterY = window.innerHeight / 2;
+    //     const viewportCenterX = window.innerWidth / 2;
+    //     const viewportCenterY = window.innerHeight / 2;
 
-        const panelCenterX = panelRect.left + panelRect.width / 2;
-        const panelCenterY = panelRect.top + panelRect.height / 2;
+    //     const panelCenterX = panelRect.left + panelRect.width / 2;
+    //     const panelCenterY = panelRect.top + panelRect.height / 2;
 
-        const circleCenterX = circleRect.left + circleRect.width / 2;
-        const circleCenterY = circleRect.top + circleRect.height / 2;
+    //     const circleCenterX = circleRect.left + circleRect.width / 2;
+    //     const circleCenterY = circleRect.top + circleRect.height / 2;
 
-        const groupCenterX = (panelCenterX + circleCenterX) / 2;
-        const groupCenterY = (panelCenterY + circleCenterY) / 2;
+    //     const groupCenterX = (panelCenterX + circleCenterX) / 2;
+    //     const groupCenterY = (panelCenterY + circleCenterY) / 2;
 
-        const dx = viewportCenterX - groupCenterX;
-        const dy = viewportCenterY - groupCenterY;
+    //     const dx = viewportCenterX - groupCenterX;
+    //     const dy = viewportCenterY - groupCenterY;
 
-        setOffset((prev) => ({
-            x: prev.x + dx,
-            y: prev.y + dy,
-        }));
-    }, [panels]);
+    //     setOffset((prev) => ({
+    //         x: prev.x + dx,
+    //         y: prev.y + dy,
+    //     }));
+    // }, [panels]);
 
     useEffect(() => {
         if (!open) {
             setPanels({ top: false, right: false, bottom: false, left: false });
-            setOffset({ x: 0, y: 0 });
+            // setOffset({ x: 0, y: 0 });
         }
     }, [open]);
 
@@ -141,11 +141,11 @@ export function WordDialog({ open, lexeme, fallbackWord, onOpenChange }: WordDia
 
                 {/* Centered main radial dialog */}
                 <div
-                    ref={groupRef}
+                    // ref={groupRef}
                     className="relative w-[400px] h-[400px] transition-transform duration-300"
-                    style={{
-                        transform: `translate(${offset.x}px, ${offset.y}px)`,
-                    }}
+                    // style={{
+                    //     transform: `translate(${offset.x}px, ${offset.y}px)`,
+                    // }}
                 >
                     {/* OUTER RING */}
                     <div
