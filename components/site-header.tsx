@@ -20,7 +20,6 @@ function NavLink({
   href: string;
   children: React.ReactNode;
   onClick?: () => void;
-  // New change
 }) {
   const pathname = usePathname();
   const active =
