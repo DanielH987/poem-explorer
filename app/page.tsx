@@ -55,6 +55,7 @@ export default async function Catalogue({
   searchParams: Promise<Search>;
 }) {
   // New comment
+  // another new comment
   const params = await searchParams;
 
   const page = Math.max(1, parseInt(params.page ?? "1", 10));
