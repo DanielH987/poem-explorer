@@ -24,9 +24,11 @@ export type LexemeCard = {
     notes?: string;
 };
 
+// NOTE: now includes tokens
 export type LexemeWithRelations = Lexeme & {
     senses: Sense[];
     translations: Translation[];
+    tokens: Token[];
 };
 
 export function lexemeToLexemeCard(
@@ -35,28 +37,72 @@ export function lexemeToLexemeCard(
 ): LexemeCard {
     const primarySense = lexeme.senses[0] ?? null;
 
+    // -------- Examples --------
     type ExampleEntry = { text: string };
-
     let exampleText: string | undefined;
 
-    if (primarySense?.examples && Array.isArray(primarySense.examples)) {
-        const examples = primarySense.examples as ExampleEntry[];
-        exampleText = examples[0]?.text;
+    if (primarySense?.examples) {
+        const raw = primarySense.examples as unknown;
+
+        let examples: ExampleEntry[] | undefined;
+
+        if (Array.isArray(raw)) {
+            examples = raw as ExampleEntry[];
+        } else if (typeof raw === "string") {
+            try {
+                const parsed = JSON.parse(raw);
+                if (Array.isArray(parsed)) {
+                    examples = parsed;
+                }
+            } catch {
+                // ignore bad JSON
+            }
+        }
+
+        if (examples?.length && examples[0]?.text) {
+            exampleText = examples[0].text;
+        }
     }
 
-    // forms: Json? (ideally stored as { [label: string]: string })
+    // -------- Forms (Json?) --------
     let forms: Record<string, string> | undefined;
-    if (lexeme.forms && typeof lexeme.forms === "object" && !Array.isArray(lexeme.forms)) {
-        forms = lexeme.forms as Record<string, string>;
+    if (lexeme.forms) {
+        const raw = lexeme.forms as unknown;
+
+        if (raw && typeof raw === "object" && !Array.isArray(raw)) {
+            forms = raw as Record<string, string>;
+        } else if (typeof raw === "string") {
+            try {
+                const parsed = JSON.parse(raw);
+                if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+                    forms = parsed as Record<string, string>;
+                }
+            } catch {
+                // ignore
+            }
+        }
     }
 
-    // collocations: Json? (ideally stored as string[])
+    // -------- Collocations (Json? string[]) --------
     let collocations: string[] | undefined;
-    if (Array.isArray(lexeme.collocations)) {
-        collocations = lexeme.collocations as string[];
+    if (lexeme.collocations) {
+        const raw = lexeme.collocations as unknown;
+
+        if (Array.isArray(raw)) {
+            collocations = raw.filter((x): x is string => typeof x === "string");
+        } else if (typeof raw === "string") {
+            try {
+                const parsed = JSON.parse(raw);
+                if (Array.isArray(parsed)) {
+                    collocations = parsed.filter((x: unknown): x is string => typeof x === "string");
+                }
+            } catch {
+                // ignore
+            }
+        }
     }
 
-    // translations -> { [lang]: text }
+    // -------- Translations -> { [lang]: text } --------
     const translations =
         lexeme.translations.length > 0
             ? lexeme.translations.reduce<Record<string, string>>((acc, t) => {
@@ -65,23 +111,38 @@ export function lexemeToLexemeCard(
             }, {})
             : undefined;
 
-    // morphology: we can enrich this on the frontend from TokenSpan,
-    // but if you want the API to include it too, you can pass a Token here.
+    // -------- Morphology --------
+    // Prefer explicitly passed token (per-click), fall back to the first lexeme token.
+    const tokenForMorphology: Token | undefined =
+        opts?.token ?? lexeme.tokens[0];
+
     let morphology: LexemeCard["morphology"] | undefined;
-    if (opts?.token) {
-        const featsJson = opts.token.feats;
-        // normalize feats into Record<string, string>
+
+    if (tokenForMorphology) {
+        const featsJson = tokenForMorphology.feats as unknown;
         const features: Record<string, string> = {};
+
         if (featsJson && typeof featsJson === "object" && !Array.isArray(featsJson)) {
             for (const [k, v] of Object.entries(featsJson)) {
                 features[k] = String(v);
             }
+        } else if (typeof featsJson === "string") {
+            try {
+                const parsed = JSON.parse(featsJson);
+                if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+                    for (const [k, v] of Object.entries(parsed as Record<string, unknown>)) {
+                        features[k] = String(v);
+                    }
+                }
+            } catch {
+                // ignore
+            }
         }
 
         morphology = {
-            surface: opts.token.surface,
-            lemma: opts.token.lemma,
-            pos: opts.token.pos,
+            surface: tokenForMorphology.surface,
+            lemma: tokenForMorphology.lemma,
+            pos: tokenForMorphology.pos,
             features,
         };
     }
@@ -102,7 +163,7 @@ export function lexemeToLexemeCard(
         example: exampleText ? { text: exampleText } : undefined,
         morphology,
         forms,
-        transitivity: undefined, // you can add a field to Lexeme later if you want
+        transitivity: undefined, // still placeholder until you add a field in the schema
         collocations,
         frequency: lexeme.frequency ?? undefined,
         etymology: lexeme.etymology ?? undefined,

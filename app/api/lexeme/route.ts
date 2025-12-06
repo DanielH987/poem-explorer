@@ -17,11 +17,15 @@ export async function GET(req: NextRequest) {
 
   const lexeme = await prisma.lexeme.findUnique({
     where: {
-      lemma_pos: { lemma, pos }, // @@unique([lemma, pos])
+      // @@unique([lemma, pos]) in your schema
+      lemma_pos: { lemma, pos },
     },
     include: {
       senses: true,
       translations: true,
+      tokens: {
+        take: 1,
+      },
     },
   });
 
